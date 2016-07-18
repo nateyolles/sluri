@@ -1,0 +1,34 @@
+{
+  "name": "slURI",
+  "authors": [
+    "Nate Yolles <nate@nateyolles.com> (http://www.nateyolles.com)"
+  ],
+  "description": "AEM and Apache Sling client-side URI manipulation including support for selectors and suffixes.",
+  "main": "src/sluri.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "Adobe Experience Manager",
+    "AEM",
+    "Apache Sling",
+    "Sling",
+    "CQ5",
+    "CQ",
+    "URI",
+    "URL"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/nateyolles.com/sluri",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nateyolles/sluri.git"
+  },
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

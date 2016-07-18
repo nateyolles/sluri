@@ -1,0 +1,50 @@
+{
+  "name": "slURI",
+  "version": "0.0.1",
+  "description": "AEM and Apache Sling client-side URI manipulation including support for selectors and suffixes.",
+  "main": "Gruntfile.js",
+  "keywords": [
+    "Adobe Experience Manager",
+    "AEM",
+    "Apache Sling",
+    "Sling",
+    "CQ5",
+    "CQ",
+    "URI",
+    "URL"
+  ],
+  "author": "Nate Yolles <nate@nateyolles.com",
+  "contributors": [
+    {
+      "name": "Nate Yolles",
+      "email": "nate@nateyolles.com"
+    }
+  ],
+  "homepage": "https://github.com/nateyolles/sluri",
+  "licenses": {
+    "type": "Apache License, Version 2.0",
+    "url": "https://github.com/nateyolles/sluri/blob/master/LICENSE"
+  },
+  "dependencies": {
+    "grunt-template-jasmine-requirejs": "~0.1.5",
+    "phantomjs": "~1.9.1-8"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git@git.corp.adobe.com:nateyolles/sluri.git"
+  },
+  "devDependencies": {
+    "bower": "~1.7.9",
+    "grunt": "^1.0.1",
+    "grunt-bower-requirejs": "~2.0.0",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-jasmine": "~1.0.3",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-nodeunit": "~0.4.1",
+    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-watch": "~0.6.1"
+  }
+}
