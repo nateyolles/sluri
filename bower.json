@@ -25,7 +25,7 @@
     "type": "git",
     "url": "git://github.com/nateyolles/sluri.git"
   },
-  "private": true,
+  "private": false,
   "ignore": [
     "**/.*",
     "node_modules",
