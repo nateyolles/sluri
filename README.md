@@ -14,6 +14,12 @@ slURI implements the URL API with a few additions and modification building upon
 
 slURI can be be used as a global or with [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) and [RequireJS](http://requirejs.org/)/[Almond](https://github.com/requirejs/almond).
 
+Install with [Bower](https://bower.io/):
+
+```
+bower install slURI
+```
+
 ## Browser Compatibility
 
 Even though the URL API is listed as experimental, slURI does not depend on the browser's implementation of the API. slURI works on all modern browsers and Internet Explorer 9+.
