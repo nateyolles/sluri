@@ -45,6 +45,25 @@
       expect(sluri.port).toBe('12');
     });
 
+    it('should remove the port if passing in an empty string', function(){
+      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      expect(sluri.port).toBe('4502');
+
+      sluri.port = '';
+      expect(sluri.port).toBe('');
+    });
+
+    it('should not remove the port if passing in null or undefined', function(){
+      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      expect(sluri.port).toBe('4502');
+
+      sluri.port = null;
+      expect(sluri.port).toBe('4502');
+
+      sluri.port = undefined;
+      expect(sluri.port).toBe('4502');
+    });
+
     it('should not update the port number when it cannot be parsed into an int', function(){
       var sluri = new slURI('http://www.nateyolles.com/us/en/page.html');
       expect(sluri.port).toBe('');

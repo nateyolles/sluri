@@ -34,6 +34,7 @@
 //Failed to construct 'URL': Invalid base URL
 //Failed to construct 'URL': 1 argument required, but only 0 present
 // http://user:pass@www.nateyolles.com:4502/us/en/page.one.two.html/foo/bar?alpha=bravo&charlie#delta
+//var slURI = new slURI('http://www.nateyolles.com/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
 /*
 SLURI(urlString, [baseURLstring])
 SLURI(urlString, baseURLobject)
@@ -49,11 +50,33 @@ SLURI(urlString, baseURLobject)
 }(this, function() {
     'use strict';
 
-    var MIN_ARGUMENTS = 1;
-    var EMPTY_STRING = '';
+    var MIN_ARGUMENTS = 1,
+        EMPTY_STRING = '';
+
+    /* 
+     * PhantomJS does not support getting the username and password from a
+     * location object.
+     */
+    var supportUserPass = (function() {
+        var link = document.createElement('a');
+        link.href = 'http://user:pass@www.foo.com';
+
+        return link.username === 'user' && link.password === 'pass';
+    })();
 
     var slURI = function(urlString, baseURLstring) {
-        var self = this;
+        var _self = this,
+            _parts,
+            _protocol,
+            _username,
+            _password,
+            _hostname,
+            _port,
+            _pathname,
+            _selectors,
+            _suffix,
+            _searchParams,
+            _hash;
 
         /* Force instantiation of a new object */
         if (!(this instanceof slURI)) {
@@ -68,12 +91,67 @@ SLURI(urlString, baseURLobject)
                 " argument required, but only " + arguments.length + " present.");
         }
 
-        /* deconstruct url */
-        var parts;
-        
+        /* urlString must be a String or have a href attribute (URL, slURI, window.location) */
         if (typeof urlString === 'string') {
-            parts = document.createElement('a');
-            parts.href = urlString;
+            _parts = deconstructURLString(urlString);
+        } else if  (urlString && urlString.href) {
+            _parts = deconstructURLString(urlString.href);
+        } else {
+            throw new TypeError("Failed to construct 'URL': Invalid URL");
+        }
+
+        function deconstructURLString(urlString) {
+            var urlRegex = /^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/;
+
+            var link,
+                username,
+                password,
+                pathParts,
+                resourcePath,
+                selectorString,
+                extension,
+                suffix,
+                matches;
+
+            link = document.createElement('a');
+            link.href = urlString;
+
+            if (link.pathname) {
+                pathParts = link.pathname.split('.');
+                resourcePath = pathParts[0];
+                selectorString = pathParts.slice(1, pathParts.length - 1).join('.');
+                extension = pathParts[pathParts.length - 1].split('/')[0];
+                suffix;
+
+                if (pathParts.length >= 3) {
+                    suffix = pathParts[pathParts.length - 1].split('/').slice(1).join('/')
+                    suffix = suffix ? '/' + suffix : '';
+                }
+            }
+
+            if (supportUserPass) {
+                username = link.username;
+                password = link.password;
+            } else {
+                matches = urlRegex.exec(urlString);
+                username = matches[3] || EMPTY_STRING;
+                password = matches[4] || EMPTY_STRING;
+            }
+
+            return {
+                protocol : link.protocol,
+                username : username,
+                password : password,
+                hostname : link.host,
+                port : link.port,
+                pathname : link.pathname,
+                // resourcePath : resourcePath,
+                selectorString : selectorString,
+                extension : extension,
+                suffix : suffix,
+                search : link.search,
+                hash : link.hash
+            }
         }
 
         /**
@@ -85,7 +163,7 @@ SLURI(urlString, baseURLobject)
         function integerToIPAddress(num) {
             var d = num % 256;
 
-            for (var i = 3; i > 0; i--) { 
+            for (var i = 3; i > 0; i--) {
                 num = Math.floor(num / 256);
                 d = num % 256 + '.' + d;
             }
@@ -93,224 +171,270 @@ SLURI(urlString, baseURLobject)
             return d;
         }
 
-        var extensionStart = parts.pathname.lastIndexOf('.');
-        var pathnameAndSelector = parts.pathname.substring(0, extensionStart);  // "/us/en/page.my.selector"
-        var extensionAndSuffix = parts.pathname.substring(extensionStart);      // ".html/foo/bar"
-        var selector = pathnameAndSelector.substring(pathnameAndSelector.indexOf('.') + 1);
-        var pathname = pathnameAndSelector.substring(0, pathnameAndSelector.indexOf('.'));
-        var suffix = extensionAndSuffix.substring(extensionAndSuffix.indexOf('/'))
-        var extension = extensionAndSuffix.substring(1, extensionAndSuffix.indexOf('/'))
-        pathname += '.' + extension;
+        function extend(a, b){
+            for (var key in b)
+                if (b.hasOwnProperty(key))
+                    a[key] = b[key];
+            return a;
+        }
 
-
-        var _protocol,
-            _username,
-            _password,
-            _hostname,
-            _port,
-            //_extension,
-            _searchParams,
-            _hash;
-
-        //var _hash = parts.hash || EMPTY_STRING;             //"#delta"
-        //this.host = parts.host || EMPTY_STRING;             //"www.yahoo.com:4502";
-        //this.hostname = parts.hostname || EMPTY_STRING;     //"www.yahoo.com";
-        this.href = parts.href || EMPTY_STRING;             //"http://nate:yolles@www.yahoo.com:4502/page.html?alpha=bravo&charlie=#delta"
-        //this.origin = "http://www.yahoo.com:4502"; //readonly
-        //this.password = parts.password || EMPTY_STRING;     // "yolles";
-        this.pathname = pathname || EMPTY_STRING;           //"/page.html";        "/us/en/page.my.selector.html/foo/bar"
-        //var _port = parts.port || EMPTY_STRING;             //"4502";
-        //this.protocol = parts.protocol || EMPTY_STRING;     //"http:";
-        //this.search = parts.search || EMPTY_STRING;         //"?alpha=bravo&charlie="; 
-        //this.searchParams = new slURISearchParams(this.search); //URLSearchParams
-        //this.username = parts.username || EMPTY_STRING;      //"nate";
-        this.suffix = suffix || EMPTY_STRING;               //"/foo/bar";
-        //this.selectorString = selector || EMPTY_STRING;     //"foo.bar"
-        this.selectors = new slURISelectors(selector);
-        this.extension = extension || EMPTY_STRING;         //"html"
-
-        Object.defineProperty(this, 'protocol', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _protocol || EMPTY_STRING;
-            },
-            set: function(value) {
-                if (value && /^[A-Za-z-]+:?$/.test(value)) {
-                    _protocol = value.substr(-1) === ':' ? value : value + ':';
+        Object.defineProperties(this, {
+            'protocol': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _protocol || EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value && /^[A-Za-z-]+:?$/.test(value)) {
+                        _protocol = value.substr(-1) === ':' ? value : value + ':';
+                    }
                 }
-            }
-        });
-
-        Object.defineProperty(this, 'username', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _username || EMPTY_STRING;
             },
-            set: function(value) {
-                _username = EMPTY_STRING + value;
-            }
-        });
 
-        Object.defineProperty(this, 'password', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _password || EMPTY_STRING;
+            'username': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _username || EMPTY_STRING;
+                },
+                set: function(value) {
+                    _username = EMPTY_STRING + value;
+                }
             },
-            set: function(value) {
-                _password = EMPTY_STRING + value;
-            }
-        });
 
-        Object.defineProperty(this, 'hostname', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _hostname || EMPTY_STRING;
+            'password': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _password || EMPTY_STRING;
+                },
+                set: function(value) {
+                    _password = EMPTY_STRING + value;
+                }
             },
-            set: function(value) {
-                if (value) {
-                    if (!isNaN(value)) {
-                        _hostname = integerToIPAddress(value);
+
+            'hostname': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _hostname || EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value) {
+                        if (!isNaN(value)) {
+                            _hostname = integerToIPAddress(value);
+                        } else {
+                            _hostname = value.split(':')[0];
+                        }
+                    }
+                }
+            },
+
+            'host': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    var tempHost = _hostname || EMPTY_STRING;
+
+                    if (_port) {
+                        tempHost += ':' + _port;
+                    }
+
+                    return tempHost;
+                },
+                set: function(value) {
+                    if (value) {
+                        var parts = value.split(':'),
+                            hostPart = parts[0],
+                            portPart = parts[1];
+
+                        this.hostname = hostPart;
+
+                        if (portPart) {
+                            this.port = portPart;
+                        }
+                    }
+                }
+            },
+
+            'port': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _port || EMPTY_STRING;
+                },
+                set: function(value) {
+                    //if (!isNaN(value)) {
+                    if (value !== null && value !== undefined) {
+                        if (value == EMPTY_STRING) {
+                            _port = value;
+                        } else if (typeof value === 'number' || /^\d+(\.\d+)?$/.test(value)) {
+                            _port = EMPTY_STRING + parseInt(value, 10);
+                        }
+                    }
+                }
+            },
+
+            'origin': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return this.protocol + '//' + this.host;
+                },
+                set: function(value) {
+                    /* read-only */
+                }
+            },
+
+            'pathname': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _pathname || '/';
+                },
+                set: function(value) {
+                    if (!null && !undefined) {
+                        _pathname = value;
+                    }
+                }
+            },
+
+            'extension': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return this.pathname === '/' ? EMPTY_STRING : this.pathname.substr(this.pathname.lastIndexOf('.') + 1);
+                    //return this.pathname.substr(this.pathname.lastIndexOf('.') + 1) || EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value && this.pathname && this.pathname.indexOf('.') !== -1) {
+                        this.pathname = this.pathname.substr(0, this.pathname.lastIndexOf('.') + 1) + value;
+                    }
+                }
+            },
+
+            'selectorString': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return this.selectors.values() ? this.selectors.values().join('.') : EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value != null && value != undefined) {
+                        this.selectors = new slURISelectors(value);
+                    }
+                }
+            },
+
+            'selectors': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _selectors;
+                },
+                set: function(value) {
+                    if (value instanceof slURISelectors) {
+                        _selectors = value;
+                    }
+                }
+            },
+
+            'suffix': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _suffix;
+                },
+                set: function(value) {
+                    if (value !== null && value !== undefined) {
+                        _suffix = value;
+                    }
+                }
+            },
+
+            'search': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    var value = _searchParams.toString()
+                    return value ? '?' + value : EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value != null && value != undefined) {
+                        _searchParams = new slURISearchParams(value);
+                    }
+                }
+            },
+
+            'searchParams': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _searchParams;
+                },
+                set: function(value) {
+                    if (value instanceof slURISearchParams) {
+                        _searchParams = value;
+                    }
+                }
+            },
+
+            'hash': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return _hash || EMPTY_STRING;
+                },
+                set: function(value) {
+                    if (value) {
+                        _hash = value.indexOf('#') === 0 ? value : '#' + value;
                     } else {
-                        _hostname = value.split(':')[0];
+                        _hash = EMPTY_STRING;
+                    }
+                }
+            },
+
+            'href': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    var constructedHref = [];
+
+                    constructedHref.push(this.protocol + '//');
+                    constructedHref.push(this.username);
+                    constructedHref.push(this.password && ':' + this.password);
+                    constructedHref.push((this.username || this.password) && '@');
+                    constructedHref.push(this.host);
+                    constructedHref.push(this.pathname);
+                    constructedHref.push(this.search);
+                    constructedHref.push(this.hash);
+
+                    return constructedHref.join('');
+                },
+                set: function(value) {
+                    if (value) {
+                        _parts = deconstructURLString(value);
+                        temp(_parts);
                     }
                 }
             }
         });
 
-        Object.defineProperty(this, 'host', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                var tempHost = _hostname || EMPTY_STRING;
-
-                if (_port) {
-                    tempHost += ':' + _port;
-                }
-
-                return tempHost;
-            },
-            set: function(value) {
-                if (value) {
-                    var parts = value.split(':'),
-                        hostPart = parts[0],
-                        portPart = parts[1];
-
-                    this.hostname = hostPart;
-
-                    if (portPart) {
-                        this.port = portPart;
-                    }
-                }
-            }
-        });
-
-        Object.defineProperty(this, 'port', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _port || EMPTY_STRING;
-            },
-            set: function(value) {
-                //if (!isNaN(value)) {
-                if (typeof value === 'number' || /^\d+(\.\d+)?$/.test(value)) {
-                    _port = EMPTY_STRING + parseInt(value, 10);
-                }
-            }
-        });
-
-        Object.defineProperty(this, 'origin', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return this.protocol + '//' + this.host;
-            },
-            set: function(value) {
-                /* read-only */
-            }
-        });
-
-        Object.defineProperty(this, 'extension', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                console.log('in extension, pathname: ' + this.pathname);
-                return (this.pathname && this.pathname.split('.')[1]) || EMPTY_STRING;
-            },
-            set: function(value) {
-                if (value && this.pathname) {
-                    this.pathname.replace('.' + this.extension, '.' + value);
-                }
-            }
-        });
-
-        Object.defineProperty(this, 'selectorString', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return this.selectors.values().join('.');
-            },
-            set: function(value) {
-                this.selectors = new slURISelectors(value);
-            }
-        });
-
-        Object.defineProperty(this, 'search', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                var value = _searchParams.toString()
-                return value ? '?' + value : EMPTY_STRING;
-            },
-            set: function(value) {
-                if (value != null && value != undefined) {
-                    _searchParams = new slURISearchParams(value);
-                }
-            }
-        });
-
-        Object.defineProperty(this, 'searchParams', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _searchParams;
-            },
-            set: function(value) {
-                if (value instanceof slURISearchParams) {
-                    _searchParams = value;
-                }
-            }
-        });
-
-        Object.defineProperty(this, 'hash', {
-            enumerable : true,
-            configurable : true,
-            get: function() {
-                return _hash || EMPTY_STRING;
-            },
-            set: function(value) {
-                if (value) {
-                    _hash = value.indexOf('#') === 0 ? value : '#' + value;
-                } else {
-                    _hash = EMPTY_STRING;
-                }
-            }
-        });
-
-        this.protocol = parts.protocol;
-        this.username = parts.username;
-        this.password = parts.password;
-        this.hostname = parts.hostname;
-        this.host = parts.host;
-        this.port = parts.port;
-        this.extension = parts.extension;
-        this.search = parts.search;
-        // set by search this.searchParams = new slURISearchParams(parts.search);
-        this.hash = parts.hash;
-
+        function temp(_parts) {
+            //extend(_self, _parts);
+            _self.protocol = _parts.protocol;
+            _self.username = _parts.username;
+            _self.password = _parts.password;
+            _self.hostname = _parts.hostname;
+            _self.port = _parts.port;
+            _self.pathname = _parts.pathname;
+            _self.selectorString = _parts.selectorString;
+            _self.suffix = _parts.suffix;
+            _self.search = _parts.search;
+            _self.hash = _parts.hash;
+        }
+        temp(_parts);
     };
 
     slURI.prototype.toString = function(){
@@ -349,7 +473,7 @@ SLURI(urlString, baseURLobject)
         };
 
         this.toLocaleString = function(){
-            return toString()
+            return this.toString()
         };
 
         this.has = function(key) {
@@ -393,68 +517,41 @@ SLURI(urlString, baseURLobject)
         };
     }
 
-    
-
     function slURISelectors(selectorString) {
-        this._selectorString = selectorString;
-        this._values = this._selectorString.split('.');
-    }
+        var _values = [];
 
-    slURISelectors.prototype.toString = function() {
-        return this._selectorString;
-    }
+        if (selectorString) {
+            _values = selectorString.split('.');
+        }
 
-    slURISelectors.prototype.toLocaleString = function() {
-        return this._selectorString;
-    }
+        this.toString = function() {
+            return _values.join('.');
+        }
 
-    slURISelectors.prototype.has = function(selector) {
-        return this._values.indexOf(selector) !== -1;
-    }
+        this.toLocaleString = function() {
+            return this.toString();
+        }
 
-    slURISelectors.prototype.append = function(selector) {
-        this._values.push(selector);
-    }
+        this.has = function(selector) {
+            return _values.indexOf(selector) !== -1;
+        }
 
-    slURISelectors.prototype.delete = function(selector) {
-        var index = this._values.indexOf(selector);
+        this.append = function(selector) {
+            _values.push(selector);
+        }
 
-        if (index !== -1) {
-            this._values.splice(index, 1);
+        this.delete = function(selector) {
+            var index = _values.indexOf(selector);
+
+            if (index !== -1) {
+                _values.splice(index, 1);
+            }
+        }
+
+        this.values = function(selector) {
+            return _values;
         }
     }
 
-    slURISelectors.prototype.values = function(selector) {
-        return this._values;
-    }
-
-
-
     return slURI;
 }));
-
-//var slURI = new slURI('http://www.nateyolles.com/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
-
-// function Nate(a, b){
-//     var b = function(){
-//         console.log('bbb');
-//     }
-//     this.a = function(){
-//         console.log('aaa');
-//     }
-//     this.bb = function(){
-//         b();
-//     }
-// }
-
-// function extend(a, b){
-//     for (var key in b)
-//         if (b.hasOwnProperty(key))
-//             a[key] = b[key];
-//     return a;
-// }
-
-// var myString = "something format_abc";
-// var myRegexp = /(?:^|\s)format_(.*?)(?:\s|$)/g;
-// var match = myRegexp.exec(myString);
-// alert(match[1]);
