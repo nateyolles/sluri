@@ -8,12 +8,12 @@
       expect(sluri.extension).toBe('html');
     });
 
-    it('should return slash if the path absent from instantiation', function() {
+    it('should return empty string if the path absent from instantiation', function() {
       var sluri = new slURI('http://www.nateyolles.com/');
       expect(sluri.extension).toBe('');
     });
 
-    it('should return slash if the path absent from instantiation', function() {
+    it('should return empty string if the path absent from instantiation', function() {
       var sluri = new slURI('http://www.nateyolles.com');
       expect(sluri.extension).toBe('');
     });

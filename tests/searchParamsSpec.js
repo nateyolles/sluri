@@ -112,7 +112,16 @@
       expect(sluri.searchParams.toString()).toBe('alpha=foo&charlie=delta&echo=&foxtrot=bar');
     });
 
-    // TODO: multiple querystring values
+    it("should set multiple params", function() {
+      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta&alpha=echo');
+      expect(sluri.searchParams.get('alpha')).toBe('bravo');
+      expect(sluri.searchParams.getAll('alpha')).toEqual(['bravo', 'echo']);
+      
+      sluri.searchParams.set('alpha', 'foxtrot');
+      expect(sluri.searchParams.get('alpha')).toBe('foxtrot');
+      expect(sluri.searchParams.getAll('alpha')).toEqual(['foxtrot']);
+    });
+
     it("should append params", function() {
       var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta&echo');
       expect(sluri.searchParams.get('alpha')).toBe('bravo');
@@ -125,6 +134,21 @@
       sluri.searchParams.set('foxtrot', 'bar');
       expect(sluri.searchParams.get('foxtrot')).toBe('bar');
       expect(sluri.searchParams.toString()).toBe('alpha=foo&charlie=delta&echo=&foxtrot=bar');
+    });
+
+    it("should append mulitple params", function() {
+      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta&echo');
+      expect(sluri.searchParams.toString()).toBe('alpha=bravo&charlie=delta&echo=');
+      
+      sluri.searchParams.append('alpha', 'foxtrot');
+      expect(sluri.searchParams.toString()).toBe('alpha=bravo&charlie=delta&echo=&alpha=foxtrot');
+    });
+
+    it("should get the first value from mulitples", function() {
+      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta&alpha=echo');
+      expect(sluri.searchParams.toString()).toBe('alpha=bravo&charlie=delta&alpha=echo');
+
+      expect(sluri.searchParams.get('alpha')).toBe('bravo');
     });
 
     it("should get keys", function() {
@@ -143,10 +167,9 @@
       expect(sluri.searchParams.values()).toEqual(['bravo', 'delta', '', 'bar']);
     });
 
-    // TODO: multiple querystring values
     it("should get all values for a key", function() {
       var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&alpha=foxtrot&charlie=delta&echo');
-      expect(sluri.searchParams.getAll('alpha')).toBe(['bravo', 'foxtrot']);
+      expect(sluri.searchParams.getAll('alpha')).toEqual(['bravo', 'foxtrot']);
     });
 
     it("should update 'search' as well", function() {

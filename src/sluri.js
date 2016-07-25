@@ -106,28 +106,13 @@ SLURI(urlString, baseURLobject)
             var link,
                 username,
                 password,
-                pathParts,
-                resourcePath,
-                selectorString,
-                extension,
-                suffix,
+                pathParts,,
                 matches;
 
             link = document.createElement('a');
             link.href = urlString;
 
-            if (link.pathname) {
-                pathParts = link.pathname.split('.');
-                resourcePath = pathParts[0];
-                selectorString = pathParts.slice(1, pathParts.length - 1).join('.');
-                extension = pathParts[pathParts.length - 1].split('/')[0];
-                suffix;
-
-                if (pathParts.length >= 3) {
-                    suffix = pathParts[pathParts.length - 1].split('/').slice(1).join('/')
-                    suffix = suffix ? '/' + suffix : '';
-                }
-            }
+            pathParts = deconstructPathname(link.pathname);
 
             if (supportUserPass) {
                 username = link.username;
@@ -144,13 +129,54 @@ SLURI(urlString, baseURLobject)
                 password : password,
                 hostname : link.host,
                 port : link.port,
-                pathname : link.pathname,
-                // resourcePath : resourcePath,
-                selectorString : selectorString,
-                extension : extension,
-                suffix : suffix,
+                pathname : pathParts.pathname,
+                resourcePath : pathParts.resourcePath,
+                selectorString : pathParts.selectorString,
+                extension : pathParts.extension,
+                suffix : pathParts.suffix,
                 search : link.search,
                 hash : link.hash
+            }
+        }
+
+        function deconstructPathname(href) {
+            var pathParts,
+                pathname = '/',
+                resourcePath = '/',
+                selectorString= '',
+                extension = '',
+                suffix = '';
+
+            if (href) {
+                /* Convert number to string */
+                href = '' + href;
+
+                /* Ensure pathname starts with a slash */
+                if (href.indexOf('/') !== 0) {
+                    href = '/' + href;
+                }
+
+                pathParts = href.split('.');
+                resourcePath = pathParts[0];
+                selectorString = pathParts.slice(1, pathParts.length - 1).join('.');
+                extension = pathParts[pathParts.length - 1].split('/')[0];
+
+                if (pathParts.length >= 2) {
+                    suffix = pathParts[pathParts.length - 1].split('/').slice(1).join('/')
+                    suffix = suffix ? '/' + suffix : '';
+                    pathname = resourcePath + '.' + (selectorString && (selectorString + '.')) + extension;
+                } else {
+                    pathParts = href.split('/'); 
+                    pathname = pathParts.length > 2 ? pathParts[1] : href;
+                }
+            }
+
+            return {
+                pathname : pathname,
+                resourcePath : resourcePath,
+                selectorString : selectorString,
+                extension : extension,
+                suffix : suffix
             }
         }
 
@@ -171,10 +197,13 @@ SLURI(urlString, baseURLobject)
             return d;
         }
 
-        function extend(a, b){
-            for (var key in b)
-                if (b.hasOwnProperty(key))
+        function extend(a, b) {
+            for (var key in b) {
+                if (b.hasOwnProperty(key)) {
                     a[key] = b[key];
+                }
+            }
+
             return a;
         }
 
@@ -265,7 +294,6 @@ SLURI(urlString, baseURLobject)
                     return _port || EMPTY_STRING;
                 },
                 set: function(value) {
-                    //if (!isNaN(value)) {
                     if (value !== null && value !== undefined) {
                         if (value == EMPTY_STRING) {
                             _port = value;
@@ -294,23 +322,29 @@ SLURI(urlString, baseURLobject)
                     return _pathname || '/';
                 },
                 set: function(value) {
+                    var pathParts;
+
                     if (!null && !undefined) {
-                        _pathname = value;
+                        //_pathname = value;
+                        pathParts = deconstructPathname(value);
+                        _pathname = pathParts.pathname;
+                        this.selectorString = pathParts.selectorString;
+
+                        if (pathParts.pathname && pathParts.pathname.indexOf('/') === -1) {
+                            this.suffix = '';
+                        }
                     }
                 }
             },
 
-            'extension': {
+            'resourcePath': {
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    return this.pathname === '/' ? EMPTY_STRING : this.pathname.substr(this.pathname.lastIndexOf('.') + 1);
-                    //return this.pathname.substr(this.pathname.lastIndexOf('.') + 1) || EMPTY_STRING;
+                    return this.pathname.split('.')[0];
                 },
                 set: function(value) {
-                    if (value && this.pathname && this.pathname.indexOf('.') !== -1) {
-                        this.pathname = this.pathname.substr(0, this.pathname.lastIndexOf('.') + 1) + value;
-                    }
+                    /* read-only */
                 }
             },
 
@@ -336,6 +370,19 @@ SLURI(urlString, baseURLobject)
                 set: function(value) {
                     if (value instanceof slURISelectors) {
                         _selectors = value;
+                    }
+                }
+            },
+
+            'extension': {
+                enumerable : true,
+                configurable : true,
+                get: function() {
+                    return this.pathname.indexOf('.') === -1 ? EMPTY_STRING : this.pathname.substr(this.pathname.lastIndexOf('.') + 1);
+                },
+                set: function(value) {
+                    if (value && this.pathname && this.pathname.indexOf('.') !== -1) {
+                        this.pathname = this.pathname.substr(0, this.pathname.lastIndexOf('.') + 1) + value;
                     }
                 }
             },
@@ -407,6 +454,7 @@ SLURI(urlString, baseURLobject)
                     constructedHref.push((this.username || this.password) && '@');
                     constructedHref.push(this.host);
                     constructedHref.push(this.pathname);
+                    constructedHref.push(this.suffix);
                     constructedHref.push(this.search);
                     constructedHref.push(this.hash);
 
@@ -428,7 +476,8 @@ SLURI(urlString, baseURLobject)
             _self.password = _parts.password;
             _self.hostname = _parts.hostname;
             _self.port = _parts.port;
-            _self.pathname = _parts.pathname;
+            _self.resourcePath = _parts.resourcePath;
+            _pathname = _parts.pathname;
             _self.selectorString = _parts.selectorString;
             _self.suffix = _parts.suffix;
             _self.search = _parts.search;
@@ -448,7 +497,7 @@ SLURI(urlString, baseURLobject)
     function slURISearchParams(searchString) {
         var _searchString,
             _searchStringSplit,
-            _valueDictionary = {};
+            _valueDictionary = [];
 
         if (searchString) {
             _searchString = (EMPTY_STRING + searchString).replace('?', '');
@@ -456,64 +505,107 @@ SLURI(urlString, baseURLobject)
 
             for (var x = 0; x < _searchStringSplit.length; x++) {
                 var split = _searchStringSplit[x].split('=');
-                _valueDictionary[split[0]] = split[1] || EMPTY_STRING;
+                _valueDictionary.push({key: split[0], value: split[1] || EMPTY_STRING});
             }
         }
 
         this.toString = function() {
             var valueArray = [];
 
-            for (var key in _valueDictionary) {
-                if (_valueDictionary.hasOwnProperty(key)) {
-                    valueArray.push(key + '=' + _valueDictionary[key]);
-                }
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                valueArray.push(_valueDictionary[x].key + '=' + _valueDictionary[x].value);
             }
 
             return valueArray.length > 0 ? valueArray.join('&') : EMPTY_STRING;
         };
 
         this.toLocaleString = function(){
-            return this.toString()
+            return this.toString();
         };
 
         this.has = function(key) {
-            return _valueDictionary[key] !== undefined;
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                if (_valueDictionary[x].key === key) {
+                    return true;
+                }
+            }
+
+            return false;
         };
 
         this.get = function(key) {
-            return _valueDictionary[key] !== undefined ? _valueDictionary[key] : null;
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                if (_valueDictionary[x].key === key) {
+                    return _valueDictionary[x].value;
+                }
+            }
+
+            return null;
+        };
+
+        this.getAll = function(key) {
+            var values = [];
+
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                if (_valueDictionary[x].key === key) {
+                    values.push(_valueDictionary[x].value);
+                }
+            }
+
+            return values;
         };
 
         this.delete = function(key) {
-            delete _valueDictionary[key];
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                if (_valueDictionary[x].key == key) {
+                    _valueDictionary.splice(x, 1);
+                }
+            }
         };
 
         this.append = function(key, value) {
-            _valueDictionary[key] = value;
+            _valueDictionary.push({key: key, value: value});
         };
 
         this.set = function(key, value) {
-            _valueDictionary[key] = value;
+            var found = 0;
+
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                if (_valueDictionary[x].key === key) {
+                    if (!found) {
+                        _valueDictionary[x].value = value;
+                    } else {
+                        /* Remove all elements other than the first */
+                        _valueDictionary.splice(x, 1);
+                    }
+
+                    found++;
+                }
+            }
+
+            if (found === 0) {
+                this.append(key, value);
+            }
         };
 
         this.keys = function() {
-            return Object.keys(_valueDictionary);
+            var keyArray = [];
+
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                keyArray.push(_valueDictionary[x].key);
+            }
+
+            return keyArray;
         };
 
         this.values = function() {
             var valueArray = [];
-            
-            for (var key in _valueDictionary) {
-               if (_valueDictionary.hasOwnProperty(key)) {
-                  valueArray.push(_valueDictionary[key]);
-               }
+
+            for (var x = 0; x < _valueDictionary.length; x++) {
+                valueArray.push(_valueDictionary[x].value);
             }
 
             return valueArray;
-        };
-
-        this.getAll = function(key) {
-            throw Error('not implemented yet');
         };
     }
 
