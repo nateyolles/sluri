@@ -51,7 +51,8 @@ SLURI(urlString, baseURLobject)
     'use strict';
 
     var MIN_ARGUMENTS = 1,
-        EMPTY_STRING = '';
+        EMPTY_STRING = '',
+        ERROR_MESSAGE = "Failed to construct 'URL': Invalid URL";
 
     /* 
      * PhantomJS does not support getting the username and password from a
@@ -64,7 +65,7 @@ SLURI(urlString, baseURLobject)
         return link.username === 'user' && link.password === 'pass';
     })();
 
-    var slURI = function(urlString, baseURLstring) {
+    var slURI = function(urlString, baseURL) {
         var _self = this,
             _parts,
             _protocol,
@@ -93,11 +94,47 @@ SLURI(urlString, baseURLobject)
 
         /* urlString must be a String or have a href attribute (URL, slURI, window.location) */
         if (typeof urlString === 'string') {
-            _parts = deconstructURLString(urlString);
-        } else if  (urlString && urlString.href) {
+            if (urlString.indexOf('/') === 0) {
+                if (baseURL) {
+                    var baseOrigin;
+                    var baseHostname;
+
+                    if (typeOfURL(baseURL)) {
+                        baseOrigin = baseURL.origin;
+                    } else {
+                        var deconstructedBaseURL = deconstructURLString(baseURL);
+                        baseOrigin = deconstructedBaseURL.hostname && deconstructedBaseURL.origin;
+                    }
+
+                    if (baseOrigin) {
+                        urlString = baseOrigin + urlString;
+                        _parts = deconstructURLString(urlString);
+                    } else {
+                        throw new TypeError(ERROR_MESSAGE);
+                    }
+                } else {
+                    throw new TypeError(ERROR_MESSAGE);
+                }
+            } else if (constructableURL(urlString)) {
+                _parts = deconstructURLString(urlString);
+            } else {
+                throw new TypeError(ERROR_MESSAGE);
+            }
+        } else if (typeOfURL(urlString)) {
             _parts = deconstructURLString(urlString.href);
         } else {
-            throw new TypeError("Failed to construct 'URL': Invalid URL");
+            throw new TypeError(ERROR_MESSAGE);
+        }
+
+        function constructableURL(href) {
+            return /^\w+:\/\//.test(href);
+        }
+
+        function typeOfURL(url) {
+            return url instanceof Location ||
+                    url instanceof slURI ||
+                    url instanceof HTMLAnchorElement ||
+                    (typeof URL !== 'undefined' && url instanceof URL)
         }
 
         function deconstructURLString(urlString) {
@@ -106,7 +143,7 @@ SLURI(urlString, baseURLobject)
             var link,
                 username,
                 password,
-                pathParts,,
+                pathParts,
                 matches;
 
             link = document.createElement('a');
@@ -129,6 +166,7 @@ SLURI(urlString, baseURLobject)
                 password : password,
                 hostname : link.host,
                 port : link.port,
+                origin: link.origin,
                 pathname : pathParts.pathname,
                 resourcePath : pathParts.resourcePath,
                 selectorString : pathParts.selectorString,
