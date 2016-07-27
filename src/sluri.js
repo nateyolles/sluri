@@ -13,33 +13,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// https://github.com/umdjs/umd/blob/master/templates/amdWeb.js
-// Uses AMD or browser globals to create a module.
 
-// If you want something that will also work in Node, see returnExports.js
-// If you want to support other stricter CommonJS environments,
-// or if you need to create a circular dependency, see commonJsStrict.js
-
-// Defines a module "amdWeb" that depends on another module called "b".
-// Note that the name of the module is implied by the file name. It is best
-// if the file name and the exported global have matching names.
-
-// If the 'b' module also uses this type of boilerplate, then
-// in the browser, it will create a global .b that is used below.
-
-// If you do not want to support the browser global path, then you
-// can remove the `root` use and the passing of `this` as the first arg to
-// the top function.
-//Failed to construct 'URL': Invalid URL
-//Failed to construct 'URL': Invalid base URL
-//Failed to construct 'URL': 1 argument required, but only 0 present
-// http://user:pass@www.nateyolles.com:4502/us/en/page.one.two.html/foo/bar?alpha=bravo&charlie#delta
-//var slURI = new slURI('http://www.nateyolles.com/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
-/*
-SLURI(urlString, [baseURLstring])
-SLURI(urlString, baseURLobject)
-*/
+/**
+ * slURI is a client-side URI/URL manipulation library for Adobe Experience
+ * Manager (AEM/CQ5) and Apache Sling. slURI is an implementation of the
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/URL|URL API} with
+ * considerations for the unique URL structure of AEM/Sling applications.
+ *
+ * Example:
+ * var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
+ * sluri.protocol === 'http:'
+ * sluri.username === 'user'
+ * sluri.password === 'pass'
+ * sluri.hostname === 'www.nateyolles.com'
+ * sluri.port === '4502'
+ * sluri.host === 'www.nateyolles.com:4502'
+ * sluri.pathname === '/us/en/page.biz.baz.html'
+ * sluri.resourcePath === '/us/en/page'
+ * sluri.extension === 'html'
+ * sluri.selectorString === 'biz.baz'
+ * sluri.selectors.constructor.name === 'slURISelectors'
+ *     sluri.selectors.toString() === 'biz.baz'
+ *     sluri.selectors.has('biz') === true
+ *     sluri.selectors.append('qux')
+ *     sluri.selectors.delete('biz')
+ *     sluri.selectors.values() is ['baz', 'qux']
+ * sluri.search === '?alpha=bravo&charlie=delta'
+ * sluri.searchParams.constructor.name === 'slURISearchParams'
+ *     sluri.searchParams.toString() === 'alpha=bravo&charlie=delta'
+ *     sluri.selectors.has('alpha') === true
+ *     sluri.selectors.get('alpha') === 'bravo'
+ *     sluri.selectors.getAll('alpha') === ['bravo']
+ *     sluri.selectors.keys() is ['alpha', 'charlie']
+ *     sluri.selectors.values() is ['bravo', 'delta']
+ *     sluri.selectors.set('alpha', 'echo')
+ *     sluri.selectors.delete('bravo')
+ * sluri.suffx === '/foo/bar'
+ * sluri.hash === '#foxtrot'
+ *
+ * Usage:
+ * var sluri = new SLURI(urlString [, baseURL]);
+ *
+ * Where urlString and baseURL are either a String, URL, Location or
+ * HTMLAnchorElement and baseURL is optional. For example:
+ *
+ * Given:
+ * var fooString = 'http://www.foo.com/us/en/foo.html';
+ * var barString = 'bar.html';
+ * var fooURL = new URL('http://www.foo.com/us/en/page.html');
+ * var fooAnchor = document.createElement('a);
+ *     fooAnchor.href = 'http://www.foo.com/us/en/page.html';
+ * window.location === 'http://www.currentsite.com';
+ *
+ * These are valid constructor calls:
+ * var sluri = new slURI(fooString); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new slURI(fooURL); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new slURI(fooAnchor); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new slURI(window.location); // sluri.href === 'http://www.currentsite.com/'
+ * var sluri = new slURI(barString, fooString); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new slURI(barString, fooURL); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new slURI(barString, fooAnchor); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new slURI(barString, window.location); // sluri.href ==='http://www.currentsite.com/bar.html'
+ *
+ * This script is in a UMD (Universal Module Definition) pattern allowing the
+ * script to be used as a global or as an AMD (Asynchronous Module Definition)
+ * module with the use of an AMD loader such as RequireJS or Almond.
+ *
+ * @module slURI
+ * @author Nate Yolles <nate@nateyolles.com>
+ * @copyright Nate Yolles 2016
+ * @license Apache-2.0
+ * @implements {URL}
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URL} for URL interface
+ * @see {@link https://github.com/umdjs/umd/blob/master/templates/amdWeb.js} for UMD boilerplate
+ */
 (function (root, factory) {
+    'use strict';
+
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
@@ -52,11 +102,17 @@ SLURI(urlString, baseURLobject)
 
     var MIN_ARGUMENTS = 1,
         EMPTY_STRING = '',
-        ERROR_MESSAGE = "Failed to construct 'URL': Invalid URL";
+        ERROR_MESSAGE = 'Failed to construct \'URL\': Invalid URL';
 
-    /* 
-     * PhantomJS does not support getting the username and password from a
-     * location object.
+    /**
+     * Determine if the browser supports getting the username and password from
+     * an HTMLAnchorElement of which PhantomJS does not.
+     *
+     * @private
+     * @member {Boolean}
+     * @todo Remove this function, write a PhantomJS polyfill, exclude this from
+     *     the build, or change the base functionality from parsing with the DOM
+     *     to using a regular expression.
      */
     var supportUserPass = (function() {
         var link = document.createElement('a');
@@ -65,6 +121,23 @@ SLURI(urlString, baseURLobject)
         return link.username === 'user' && link.password === 'pass';
     })();
 
+    /**
+    * A module representing a Sling URI object.
+    *
+    * The first parameter is required and must be an absolute path. However, the
+    * first parameter is permitted to be a relative path if the second parameter
+    * is provided and contains a valid URL origin.
+    *
+    * @class
+    * @alias module:slURI
+    * @param {String|URL|slURI|Location|HTMLAnchorElement} The URL used to
+    *     construct the slURI
+    * @param {String|URL|slURI|Location|HTMLAnchorElement} The base URL used to
+    *     construct the origin of the slURI if the urlString is a relative path
+    * @throws {TypeError} if no arguments provided
+    * @throws {TypeError} if URL cannot be constructed with a single parameter
+    * @throws {TypeError} if URL cannot be constructed with the base parameter
+    */
     var slURI = function(urlString, baseURL) {
         var _self = this,
             _parts,
@@ -81,25 +154,29 @@ SLURI(urlString, baseURLobject)
 
         /* Force instantiation of a new object */
         if (!(this instanceof slURI)) {
-            throw new TypeError("Failed to construct 'slURI': " +
-                "Please use the 'new' operator, this DOM " +
-                "object constructor cannot be called as a function.");
+            throw new TypeError('Failed to construct \'slURI\': ' +
+                'Please use the \'new\' operator, this DOM ' +
+                'object constructor cannot be called as a function.');
         }
 
         /* urlString parameter is required */
         if (arguments.length < MIN_ARGUMENTS) {
-            throw new TypeError("Failed to construct 'URL': " + MIN_ARGUMENTS +
-                " argument required, but only " + arguments.length + " present.");
+            throw new TypeError('Failed to construct \'URL\': ' + MIN_ARGUMENTS +
+                ' argument required, but only ' + arguments.length + ' present.');
         }
 
-        /* urlString must be a String or have a href attribute (URL, slURI, window.location) */
+        /*
+         * urlString must be a String or a URL, slURI, window.location or
+         * HTMLAnchorElement. If it's a String, it must start with a protocol.
+         * @todo: clean this up
+         */
         if (typeof urlString === 'string') {
             if (urlString.indexOf('/') === 0) {
                 if (baseURL) {
                     var baseOrigin;
                     var baseHostname;
 
-                    if (typeOfURL(baseURL)) {
+                    if (isURLObject(baseURL)) {
                         baseOrigin = baseURL.origin;
                     } else {
                         var deconstructedBaseURL = deconstructURLString(baseURL);
@@ -120,24 +197,62 @@ SLURI(urlString, baseURLobject)
             } else {
                 throw new TypeError(ERROR_MESSAGE);
             }
-        } else if (typeOfURL(urlString)) {
+        } else if (isURLObject(urlString)) {
             _parts = deconstructURLString(urlString.href);
         } else {
             throw new TypeError(ERROR_MESSAGE);
         }
 
+        /**
+         * Determines if a URL string is formatted in a way that it can become a
+         * slURI. Essentially that means the string starts with a protocal such
+         * as "http://".
+         *
+         * @private
+         * @function
+         * @param {String} the URL string to test
+         * @returns {Boolean}
+         */
         function constructableURL(href) {
             return /^\w+:\/\//.test(href);
         }
 
-        function typeOfURL(url) {
+        /**
+         * Determines if an object is a URL type of object such as Location,
+         * HTMLAnchorElement, URL or slURI.
+         *
+         * @private
+         * @function
+         * @param {object} the object to test
+         * @returns {Boolean}
+         */
+        function isURLObject(url) {
             return url instanceof Location ||
                     url instanceof slURI ||
                     url instanceof HTMLAnchorElement ||
-                    (typeof URL !== 'undefined' && url instanceof URL)
+                    (typeof URL !== 'undefined' && url instanceof URL);
         }
 
+        /**
+         * Deconstructs a URL string into individual URL parts such as protocol,
+         * host, hostname, port, etc...as well as the addition of Sling URL
+         * components such as resourcePath, selectorString, and suffix.
+         *
+         * @private
+         * @function
+         * @param {String} the URL string to deconstruct
+         * @returns {object}
+         */
         function deconstructURLString(urlString) {
+            /**
+             * The regex used to find the username and password from the URL
+             * string.
+             *
+             * @todo Either remove when PhantomJS polyfill is created, simplify
+             *     to only search for username and password, or expand to handle
+             *     Sling URLs and remove the URL parsing with the DOM Anchor
+             *     tag.
+             */
             var urlRegex = /^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/;
 
             var link,
@@ -151,6 +266,11 @@ SLURI(urlString, baseURLobject)
 
             pathParts = deconstructPathname(link.pathname);
 
+            /*
+             * @todo Remove this function, write a PhantomJS polyfill, exclude
+             *     this from the build, or change the base functionality from
+             *     parsing with the DOM to using a regular expression.
+             */
             if (supportUserPass) {
                 username = link.username;
                 password = link.password;
@@ -174,9 +294,23 @@ SLURI(urlString, baseURLobject)
                 suffix : pathParts.suffix,
                 search : link.search,
                 hash : link.hash
-            }
+            };
         }
 
+        /**
+         * Deconstructs a pathname string into the individual URL pathname,
+         * resourcePath, selectorString, extension, and suffix. Whereas the
+         * traditional URL type objects (URL, Location, HTMLAnchorElement) would
+         * combine all of these into the "pathname" property of their objects,
+         * we want to break them apart for AEM/Sling type URLs.
+         *
+         * @private
+         * @function
+         * @param {String} the href string to deconstruct
+         * @returns {object}
+         * @todo Decide on whether to retain URL string parsing through the DOM
+         *     or replace this with a regular expression and matching groups.
+         */
         function deconstructPathname(href) {
             var pathParts,
                 pathname = '/',
@@ -200,7 +334,7 @@ SLURI(urlString, baseURLobject)
                 extension = pathParts[pathParts.length - 1].split('/')[0];
 
                 if (pathParts.length >= 2) {
-                    suffix = pathParts[pathParts.length - 1].split('/').slice(1).join('/')
+                    suffix = pathParts[pathParts.length - 1].split('/').slice(1).join('/');
                     suffix = suffix ? '/' + suffix : '';
                     pathname = resourcePath + '.' + (selectorString && (selectorString + '.')) + extension;
                 } else {
@@ -215,14 +349,19 @@ SLURI(urlString, baseURLobject)
                 selectorString : selectorString,
                 extension : extension,
                 suffix : suffix
-            }
+            };
         }
 
         /**
-         * Convert integer to IP address
+         * Convert integer to IP address string.
          *
-         * integerToIPAddress(910385503) = '54.67.97.95'
-         * see: http://stackoverflow.com/a/8105740/3022863
+         * @function
+         * @private
+         * @example
+         * // returns '54.67.97.95'
+         * integerToIPAddress(910385503)
+         * @returns {String} The IP Address converted from an integer
+         * @see {@link http://stackoverflow.com/a/8105740/3022863}
          */
         function integerToIPAddress(num) {
             var d = num % 256;
@@ -235,17 +374,42 @@ SLURI(urlString, baseURLobject)
             return d;
         }
 
-        function extend(a, b) {
-            for (var key in b) {
-                if (b.hasOwnProperty(key)) {
-                    a[key] = b[key];
-                }
-            }
+        /**
+         * Extend and object with another object.
+         *
+         * @function
+         * @private
+         * @param {object} The base object
+         * @param {object} The extension object
+         * @returns {object} The extended base object
+         */
+        // function extend(a, b) {
+        //     for (var key in b) {
+        //         if (b.hasOwnProperty(key)) {
+        //             a[key] = b[key];
+        //         }
+        //     }
 
-            return a;
-        }
+        //     return a;
+        // }
 
+        /**
+         * Define slURI getters and setters.
+         *
+         * The slURI object behaves the same as the URL object by accessing and
+         * setting properties rather than using functions.
+         */
         Object.defineProperties(this, {
+            /**
+             * Getter and setter for the URL protocol.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.protocol; // returns 'http:'
+             * sluri.protocol = 'https';
+             */
             'protocol': {
                 enumerable : true,
                 configurable : true,
@@ -259,6 +423,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL username.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.username; // returns 'myusername'
+             * sluri.username = 'mynewusername';
+             */
             'username': {
                 enumerable : true,
                 configurable : true,
@@ -270,6 +444,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL password.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.password; // returns 'mypassword'
+             * sluri.password = 'mypassword';
+             */
             'password': {
                 enumerable : true,
                 configurable : true,
@@ -281,6 +465,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL hostname.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.hostname; // returns 'www.mysite.com'
+             * sluri.hostname = 'www.mynewsite.com';
+             */
             'hostname': {
                 enumerable : true,
                 configurable : true,
@@ -298,6 +492,17 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL host which is the hostname and port
+             * number.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.host; // returns 'www.mysite.com:4502'
+             * sluri.host = 'www.mynewsite.com:8080';
+             */
             'host': {
                 enumerable : true,
                 configurable : true,
@@ -325,6 +530,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL port.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.hostname; // returns '4502'
+             * sluri.hostname = 8080;
+             */
             'port': {
                 enumerable : true,
                 configurable : true,
@@ -333,7 +548,7 @@ SLURI(urlString, baseURLobject)
                 },
                 set: function(value) {
                     if (value !== null && value !== undefined) {
-                        if (value == EMPTY_STRING) {
+                        if (value === EMPTY_STRING) {
                             _port = value;
                         } else if (typeof value === 'number' || /^\d+(\.\d+)?$/.test(value)) {
                             _port = EMPTY_STRING + parseInt(value, 10);
@@ -342,17 +557,39 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter for the URL origin which is the protocol, hostname and
+             * port.
+             *
+             * @public
+             * @member
+             * @readonly
+             * @returns {String}
+             * @example
+             * sluri.origin; // returns 'http://www.mysite.com:4502'
+             */
             'origin': {
                 enumerable : true,
                 configurable : true,
                 get: function() {
                     return this.protocol + '//' + this.host;
                 },
-                set: function(value) {
+                set: function() {
                     /* read-only */
                 }
             },
 
+            /**
+             * Getter and setter for the URL pathname which includes the
+             * resourcePath, selectors and extension. Defaults to '/'.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.pathname; // returns '/us/en/page.foo.bar.html'
+             * sluri.pathname = '/fr/fr/page.html';
+             */
             'pathname': {
                 enumerable : true,
                 configurable : true,
@@ -363,7 +600,6 @@ SLURI(urlString, baseURLobject)
                     var pathParts;
 
                     if (!null && !undefined) {
-                        //_pathname = value;
                         pathParts = deconstructPathname(value);
                         _pathname = pathParts.pathname;
                         this.selectorString = pathParts.selectorString;
@@ -375,17 +611,38 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter for the URL resourcePath which is the pathname without the
+             * selectors or extension.
+             *
+             * @public
+             * @member
+             * @readonly
+             * @returns {String}
+             * @example
+             * sluri.resourcePath; // returns '/us/en/page'
+             */
             'resourcePath': {
                 enumerable : true,
                 configurable : true,
                 get: function() {
                     return this.pathname.split('.')[0];
                 },
-                set: function(value) {
+                set: function() {
                     /* read-only */
                 }
             },
 
+            /**
+             * Getter and setter for the URL selectorString.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.selectorString; // returns 'foo.bar'
+             * sluri.selectorString = 'biz.baz';
+             */
             'selectorString': {
                 enumerable : true,
                 configurable : true,
@@ -393,12 +650,22 @@ SLURI(urlString, baseURLobject)
                     return this.selectors.values() ? this.selectors.values().join('.') : EMPTY_STRING;
                 },
                 set: function(value) {
-                    if (value != null && value != undefined) {
+                    if (value !== null && value !== undefined) {
                         this.selectors = new slURISelectors(value);
                     }
                 }
             },
 
+            /**
+             * Getter and setter for the URL selectors object.
+             *
+             * @public
+             * @member
+             * @returns {slURISelectors}
+             * @example
+             * sluri.selectors; // returns {}
+             * sluri.selectors = new slURISelectors('biz.baz');
+             */
             'selectors': {
                 enumerable : true,
                 configurable : true,
@@ -412,6 +679,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL extension.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.extension // returns 'html'
+             * sluri.extension = 'json';
+             */
             'extension': {
                 enumerable : true,
                 configurable : true,
@@ -425,6 +702,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL suffix.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.suffix // returns '/foo/bar'
+             * sluri.suffix = '/biz/baz';
+             */
             'suffix': {
                 enumerable : true,
                 configurable : true,
@@ -438,20 +725,40 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL search.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.search // returns '?alpha=bravo&charlie=delta'
+             * sluri.search = 'foo=bar&biz=baz';
+             */
             'search': {
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    var value = _searchParams.toString()
+                    var value = _searchParams.toString();
                     return value ? '?' + value : EMPTY_STRING;
                 },
                 set: function(value) {
-                    if (value != null && value != undefined) {
+                    if (value !== null && value !== undefined) {
                         _searchParams = new slURISearchParams(value);
                     }
                 }
             },
 
+            /**
+             * Getter and setter for the URL searchParams object.
+             *
+             * @public
+             * @member
+             * @returns {slURISearchParams}
+             * @example
+             * sluri.searchParams; // returns {}
+             * sluri.searchParams = new slURISearchParams('foo=bar&biz=baz'');
+             */
             'searchParams': {
                 enumerable : true,
                 configurable : true,
@@ -465,6 +772,16 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL hash.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.hash // returns '#foo'
+             * sluri.hash = 'bar';
+             */
             'hash': {
                 enumerable : true,
                 configurable : true,
@@ -480,6 +797,17 @@ SLURI(urlString, baseURLobject)
                 }
             },
 
+            /**
+             * Getter and setter for the URL href which is all the URL parts
+             * together.
+             *
+             * @public
+             * @member
+             * @returns {String}
+             * @example
+             * sluri.href // returns 'http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot'
+             * sluri.href = 'http://www.mysite.com/us/page.foo.html/foo/bar';
+             */
             'href': {
                 enumerable : true,
                 configurable : true,
@@ -499,6 +827,7 @@ SLURI(urlString, baseURLobject)
                     return constructedHref.join('');
                 },
                 set: function(value) {
+                    /* Deconstruct the value the same as the constructor. */
                     if (value) {
                         _parts = deconstructURLString(value);
                         temp(_parts);
@@ -507,6 +836,11 @@ SLURI(urlString, baseURLobject)
             }
         });
 
+        /*
+         * Assign the deconstructed parts to internal properties.
+         *
+         * @todo clean this up
+         */
         function temp(_parts) {
             //extend(_self, _parts);
             _self.protocol = _parts.protocol;
@@ -524,19 +858,67 @@ SLURI(urlString, baseURLobject)
         temp(_parts);
     };
 
+    /**
+     * Return the href as the String representation of the slURI object.
+     *
+     * @function
+     * @public
+     * @override
+     */
     slURI.prototype.toString = function(){
         return this.href;
     };
 
+    /**
+     * Return the href as the String representation of the slURI object.
+     *
+     * @function
+     * @public
+     * @override
+     * @see {@link toString}
+     */
     slURI.prototype.toLocaleString = function(){
         return this.href;
     };
 
+    /**
+     * The slURI implementation of the URLSearchParams interface.
+     *
+     * Allows easy access to create, read, update and delete querystring
+     * parameters without having to resort to manual string manipulation.
+     *
+     * Handles multiple values for a given key in the querystring. There are
+     * many ways different web frameworks handle this. slURISearchParams takes
+     * the same approach as the SearchParams interface that it is implementing.
+     * An example of multiple values is: '?foo=red&bar=blue&foo=green'. Calling
+     * the #get method will return the first occurance, while calling the
+     * #getAll method will return an array of all values. Calling the #set
+     * method with remove all values and create the new one. Calling #delete
+     * will remove all values. The #append method is how multiple values can be
+     * added to the querystring.
+     *
+     * @class
+     * @protected
+     * @param {String} The querystring to be deconstructed and manipulated
+     * @implements {URLSearchParams}
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams|URLSearchParams}
+     */
     function slURISearchParams(searchString) {
         var _searchString,
             _searchStringSplit,
+
+            /**
+             * The internal array that backs the querystring.
+             *
+             * @private
+             * @member
+             */
             _valueDictionary = [];
 
+        /*
+         * Deconstruct the search string and store the key value pairs in the
+         * array backing.
+         */
         if (searchString) {
             _searchString = (EMPTY_STRING + searchString).replace('?', '');
             _searchStringSplit = _searchString.split('&');
@@ -547,6 +929,17 @@ SLURI(urlString, baseURLobject)
             }
         }
 
+        /**
+         * Override the toString method to return a String representation of the
+         * querystring parameters.
+         * 
+         * @function
+         * @public
+         * @overrides
+         * @returns {String}
+         * @example
+         * sluri.searchParams.toString(); //returns 'foo=bar&biz=baz'
+         */
         this.toString = function() {
             var valueArray = [];
 
@@ -557,10 +950,32 @@ SLURI(urlString, baseURLobject)
             return valueArray.length > 0 ? valueArray.join('&') : EMPTY_STRING;
         };
 
+        /**
+         * Override the toString method to return a String representation of the
+         * querystring parameters.
+         * 
+         * @function
+         * @public
+         * @overrides
+         * @returns {String}
+         * @see {toString}
+         * @example
+         * sluri.searchParams.toString(); //returns 'foo=bar&biz=baz'
+         */
         this.toLocaleString = function(){
             return this.toString();
         };
 
+        /**
+         * Determines if the querystring has a particular parameter.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter to check for
+         * @returns {Boolean}
+         * @example
+         * sluri.searchParams.has('foo'); //returns true
+         */
         this.has = function(key) {
             for (var x = 0; x < _valueDictionary.length; x++) {
                 if (_valueDictionary[x].key === key) {
@@ -571,6 +986,16 @@ SLURI(urlString, baseURLobject)
             return false;
         };
 
+        /**
+         * Gets the value for a given querystring parameter.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter to check for
+         * @returns {String}
+         * @example
+         * sluri.searchParams.get('foo'); //returns 'bar'
+         */
         this.get = function(key) {
             for (var x = 0; x < _valueDictionary.length; x++) {
                 if (_valueDictionary[x].key === key) {
@@ -581,6 +1006,16 @@ SLURI(urlString, baseURLobject)
             return null;
         };
 
+        /**
+         * Gets all the values for a given querystring parameter.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter to check for
+         * @returns {Array}
+         * @example
+         * sluri.searchParams.getAll('foo'); //returns ['bar', 'biz']
+         */
         this.getAll = function(key) {
             var values = [];
 
@@ -593,18 +1028,49 @@ SLURI(urlString, baseURLobject)
             return values;
         };
 
+        /**
+         * Deletes the keys and values for a given querystring parameter.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter to delete
+         * @example
+         * sluri.searchParams.delete('foo');
+         */
         this.delete = function(key) {
             for (var x = 0; x < _valueDictionary.length; x++) {
-                if (_valueDictionary[x].key == key) {
+                if (_valueDictionary[x].key === key) {
                     _valueDictionary.splice(x, 1);
                 }
             }
         };
 
+        /**
+         * Appends the key and value to the querystring.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter key to add
+         * @param {String} The parameter value to add
+         * @example
+         * sluri.searchParams.append('foo', 'bar');
+         */
         this.append = function(key, value) {
             _valueDictionary.push({key: key, value: value});
         };
 
+        /**
+         * Sets the key and value to the querystring parameter.
+         *
+         * Sets the first key found and removes the rest.
+         * 
+         * @function
+         * @public
+         * @param {String} The parameter key to add
+         * @param {String} The parameter value to add
+         * @example
+         * sluri.searchParams.append('foo', 'bar');
+         */
         this.set = function(key, value) {
             var found = 0;
 
@@ -626,6 +1092,15 @@ SLURI(urlString, baseURLobject)
             }
         };
 
+        /**
+         * Gets the keys in the querystring.
+         * 
+         * @function
+         * @public
+         * @returns {array}
+         * @example
+         * sluri.searchParams.keys(); // returns ['foo', 'bar']
+         */
         this.keys = function() {
             var keyArray = [];
 
@@ -636,6 +1111,15 @@ SLURI(urlString, baseURLobject)
             return keyArray;
         };
 
+        /**
+         * Gets the values in the querystring.
+         * 
+         * @function
+         * @public
+         * @returns {array}
+         * @example
+         * sluri.searchParams.values(); // returns ['foo', 'bar']
+         */
         this.values = function() {
             var valueArray = [];
 
@@ -647,41 +1131,125 @@ SLURI(urlString, baseURLobject)
         };
     }
 
+    /**
+     * Allows easy access to create, read, update and delete the selectors
+     * without having to resort to manual string manipulation.
+     *
+     * Selectors are unique to Apache Sling and Adobe Experience Manager, as
+     * such there isn't an interface to implement. However, the slURISelectors
+     * API matches the slURLSearchParams API and URLSearchParams interface as
+     * closely as possible.
+     *
+     * @class
+     * @protected
+     * @param {String} The selector string to be deconstructed and manipulated
+     * @see {slURLSearchParams}
+     */
     function slURISelectors(selectorString) {
+        /**
+         * The internal array that backs the selector string.
+         *
+         * @private
+         * @member
+         */
         var _values = [];
 
+        /*
+         * Deconstruct the selector string and store in the array backing.
+         */
         if (selectorString) {
             _values = selectorString.split('.');
         }
 
+        /**
+         * Override the toString method to return a String representation of the
+         * selectors.
+         * 
+         * @function
+         * @public
+         * @overrides
+         * @returns {String}
+         * @example
+         * sluri.selectors.toString(); //returns 'foo.bar'
+         */
         this.toString = function() {
             return _values.join('.');
-        }
+        };
 
+        /**
+         * Override the toString method to return a String representation of the
+         * selectors.
+         * 
+         * @function
+         * @public
+         * @overrides
+         * @returns {String}
+         * @see {toString}
+         * @example
+         * sluri.searchParams.toString(); //returns 'foo.bar'
+         */
         this.toLocaleString = function() {
             return this.toString();
-        }
+        };
 
+        /**
+         * Determines if the URL contains the given selector.
+         * 
+         * @function
+         * @public
+         * @param {String} The selector to check for
+         * @returns {Boolean}
+         * @example
+         * sluri.selectors.has('foo'); //returns true
+         */
         this.has = function(selector) {
             return _values.indexOf(selector) !== -1;
-        }
+        };
 
+        /**
+         * Appends a new selector to the URL.
+         * 
+         * @function
+         * @public
+         * @param {String} The selector to add
+         * @example
+         * sluri.selectors.append('foo');
+         */
         this.append = function(selector) {
             _values.push(selector);
-        }
+        };
 
+        /**
+         * Deletes a selector from the URL.
+         * 
+         * @function
+         * @public
+         * @param {String} The selector to delete
+         * @example
+         * sluri.selectors.delete('foo');
+         */
         this.delete = function(selector) {
             var index = _values.indexOf(selector);
 
             if (index !== -1) {
                 _values.splice(index, 1);
             }
-        }
+        };
 
-        this.values = function(selector) {
+        /**
+         * Gets the selectors as an array.
+         * 
+         * @function
+         * @public
+         * @returns {array}
+         * @example
+         * sluri.selectors.values(); // returns ['foo', 'bar']
+         */
+        this.values = function() {
             return _values;
-        }
+        };
     }
 
+    /* Make the slURI object public and instantiable. */
     return slURI;
 }));

@@ -1,13 +1,13 @@
 /*global module:false*/
 module.exports = function(grunt) {
+  'use strict';
 
   // Project configuration.
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
     conf: {
-      src: 'src',
-      report: 'tests/report',
+      src: 'src'
     },
     banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -35,25 +35,17 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        unused: true,
-        boss: true,
-        eqnull: true,
-        globals: {}
-      },
       gruntfile: {
+       options: {
+          jshintrc: '.jshintrc'
+        },
         src: 'Gruntfile.js'
       },
-      lib_test: {
-        src: ['lib/**/*.js', 'test/**/*.js']
+      src: {
+        options: {
+          jshintrc: '<%=conf.src%>/.jshintrc'
+        },
+        src: '<%=conf.src%>/sluri.js'
       }
     },
     jasmine: {
@@ -72,27 +64,6 @@ module.exports = function(grunt) {
               keepRunner: true,
               outfile: 'tests.html'
           }
-      },
-      report: {
-          src: '<%=conf.src%>/*.js',
-          options: {
-              junit: {
-                  path: '<%=conf.report%>/junit'
-              }
-          }
-      }
-    },
-    nodeunit: {
-      files: ['test/**/*_test.js']
-    },
-    watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
-      },
-      lib_test: {
-        files: '<%= jshint.lib_test.src %>',
-        tasks: ['jshint:lib_test', 'nodeunit']
       }
     }
   });
@@ -100,9 +71,7 @@ module.exports = function(grunt) {
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
 
   // Default task.
@@ -110,6 +79,7 @@ module.exports = function(grunt) {
 
 
   grunt.registerTask('build', [
+    'jshint',
     'jasmine:spec'
   ]);
 
