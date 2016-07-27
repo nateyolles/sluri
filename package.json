@@ -13,7 +13,11 @@
     "URI",
     "URL"
   ],
-  "author": "Nate Yolles <nate@nateyolles.com> (http://www.nateyolles.com)",
+  "author": {
+    "name": "Nate Yolles",
+    "email": "nate@nateyolles.com",
+    "url": "http://www.nateyolles.com"
+  },
   "homepage": "https://github.com/nateyolles/sluri",
   "license": "Apache-2.0",
   "dependencies": {
@@ -34,7 +38,6 @@
     "bower": "~1.7.9",
     "grunt": "^1.0.1",
     "grunt-bower-requirejs": "~2.0.0",
-    "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-jasmine": "~1.0.3",
     "grunt-contrib-jshint": "~1.0.0",
     "grunt-contrib-uglify": "~2.0.0"
