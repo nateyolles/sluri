@@ -4,7 +4,7 @@
 
 slURI is a client-side URI/URL manipulation library for [Adobe Experience Manager](http://www.adobe.com/marketing-cloud/enterprise-content-management.html) (AEM/CQ5) and [Apache Sling](https://sling.apache.org/). slURI is an implementation of the URL API (see the [Mozilla Developer Network: URL documentation](https://developer.mozilla.org/en-US/docs/Web/API/URL)) with considerations for the unique URL structure of AEM and Sling applications.
 
-An AEM/Sling URI could look something like `http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie`.
+An AEM/Sling URI could look something like `http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie`. See the documentation for [Apache Sling URL decomposition](https://sling.apache.org/documentation/the-sling-engine/url-decomposition.html).
 
 ## Using slURI
 
