@@ -45,9 +45,9 @@
  *     sluri.searchParams.has('alpha') === true
  *     sluri.searchParams.get('alpha') === 'bravo'
  *     sluri.searchParams.getAll('alpha') === ['bravo']
- *     sluri.searchParams.keys() is ['alpha', 'charlie']
- *     sluri.searchParams.values() is ['bravo', 'delta']
- *     sluri.searchParams.set('alpha', 'echo')
+ *     sluri.searchParams.keys() is ['alpha', 'charlie', 'echo']
+ *     sluri.searchParams.values() is ['bravo', 'delta', '']
+ *     sluri.searchParams.set('alpha', 'golf')
  *     sluri.searchParams.delete('bravo')
  * sluri.suffx === '/foo/bar'
  * sluri.hash === '#foxtrot'
