@@ -17,8 +17,8 @@
   "homepage": "https://github.com/nateyolles/sluri",
   "license": "Apache-2.0",
   "dependencies": {
-    "grunt-template-jasmine-requirejs": "~0.1.5",
-    "phantomjs": "~1.9.1-8"
+    "grunt-template-jasmine-requirejs": "~0.2.3",
+    "phantomjs-prebuilt": "~2.1.8"
   },
   "engines": {
     "node": "5.5.0"
@@ -34,9 +34,9 @@
     "bower": "~1.7.9",
     "grunt": "^1.0.1",
     "grunt-bower-requirejs": "~2.0.0",
-    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-jasmine": "~1.0.3",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-uglify": "~0.5.0"
+    "grunt-contrib-jshint": "~1.0.0",
+    "grunt-contrib-uglify": "~2.0.0"
   }
 }
