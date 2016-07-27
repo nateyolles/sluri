@@ -28,6 +28,7 @@
  * sluri.hostname === 'www.nateyolles.com'
  * sluri.port === '4502'
  * sluri.host === 'www.nateyolles.com:4502'
+ * sluri.origin === 'http://www.nateyolles.com:4502'
  * sluri.pathname === '/us/en/page.biz.baz.html'
  * sluri.resourcePath === '/us/en/page'
  * sluri.extension === 'html'
@@ -41,13 +42,13 @@
  * sluri.search === '?alpha=bravo&charlie=delta'
  * sluri.searchParams.constructor.name === 'slURISearchParams'
  *     sluri.searchParams.toString() === 'alpha=bravo&charlie=delta'
- *     sluri.selectors.has('alpha') === true
- *     sluri.selectors.get('alpha') === 'bravo'
- *     sluri.selectors.getAll('alpha') === ['bravo']
- *     sluri.selectors.keys() is ['alpha', 'charlie']
- *     sluri.selectors.values() is ['bravo', 'delta']
- *     sluri.selectors.set('alpha', 'echo')
- *     sluri.selectors.delete('bravo')
+ *     sluri.searchParams.has('alpha') === true
+ *     sluri.searchParams.get('alpha') === 'bravo'
+ *     sluri.searchParams.getAll('alpha') === ['bravo']
+ *     sluri.searchParams.keys() is ['alpha', 'charlie']
+ *     sluri.searchParams.values() is ['bravo', 'delta']
+ *     sluri.searchParams.set('alpha', 'echo')
+ *     sluri.searchParams.delete('bravo')
  * sluri.suffx === '/foo/bar'
  * sluri.hash === '#foxtrot'
  *
