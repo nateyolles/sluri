@@ -13,24 +13,15 @@
     "URI",
     "URL"
   ],
-  "author": "Nate Yolles <nate@nateyolles.com>",
-  "contributors": [
-    {
-      "name": "Nate Yolles",
-      "email": "nate@nateyolles.com"
-    }
-  ],
+  "author": "Nate Yolles <nate@nateyolles.com> (http://www.nateyolles.com)",
   "homepage": "https://github.com/nateyolles/sluri",
-  "licenses": {
-    "type": "Apache License, Version 2.0",
-    "url": "https://github.com/nateyolles/sluri/blob/master/LICENSE"
-  },
+  "license": "Apache-2.0",
   "dependencies": {
     "grunt-template-jasmine-requirejs": "~0.1.5",
     "phantomjs": "~1.9.1-8"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": "5.5.0"
   },
   "repository": {
     "type": "git",
