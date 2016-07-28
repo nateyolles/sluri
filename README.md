@@ -6,11 +6,27 @@ slURI is a client-side URI/URL manipulation library for [Adobe Experience Manage
 
 An AEM/Sling URI could look something like `http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie`. See the documentation for [Apache Sling URL decomposition](https://sling.apache.org/documentation/the-sling-engine/url-decomposition.html).
 
+Instead of writing repetative and tedious string manipulation such as:
+
+```javascript
+qs += (qs.indexOf('?') === -1 ? '?' : '&') + key + '=' + value;
+url = path.split('.html')[0] + '/foo/bar' + path.split('.html')[1];
+```
+
+slURI allows you to write:
+
+```javascript
+sluri.searchParams.append(key, value);
+sluri.suffix = '/foo/bar';
+```
+
 ## Using slURI
 
 slURI can be be used as a global or with [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) and an AMD loader such as [RequireJS](http://requirejs.org/) or [Almond](https://github.com/requirejs/almond).
 
-### Bower
+Include the provided JavaScript and simply instantiate slURI objects using the `new` keyword.
+
+#### Bower
 
 Install with [Bower](https://bower.io/):
 
@@ -18,16 +34,42 @@ Install with [Bower](https://bower.io/):
 bower install slURI
 ```
 
-## URL API
+#### Use JavaScript file
+
+Include the minified distribution file [/dist/sluri.min.js](https://github.com/nateyolles/sluri/blob/master/dist/sluri.min.js) or the expanded development file [/src/sluri.js](https://github.com/nateyolles/sluri/blob/master/src/sluri.js) in your project.
+
+#### Browser Compatibility
+
+Even though the URL API is listed as experimental, slURI does not depend on the browser's implementation of the API. slURI works on all modern browsers and Internet Explorer 9+.
+
+## Building slURI
+
+#### Tests
+
+slURI tests are written with [Jasmine](http://jasmine.github.io/) and run on the PhantomJS headless browser. Tests are run with [CircleCI](https://circleci.com/)'s integration testing platform. Tests can be run locally with:
+
+```
+grunt test
+```
+
+#### Build
+
+Build slURI with:
+
+```
+grunt build
+```
+
+## API
 
 slURI implements the URL API with a few additions and modification building upon the URL API to handle `selectors`, `suffixes`, `resourcePath` and `extensions`. slURI respects all `read-only` property definitions. The only alteration in this version is that the implementation of the `URLSearchParams` interface returns arrays rather than [Iterators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
 
-Given:
+##### given the following instantiated object for example:
 ```javascript
 var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
 ```
 
----
+### slURI
 
 ```
 slURI(urlString [, baseURL])
@@ -45,102 +87,177 @@ The slURI object must be instantiated with the *new* keyword. Throws *TypeError*
 ```
 slURI.protocol
 ```
-Getter: `sluri.protocol; // returns 'http:'`
+> **getter**
+> 
+> `sluri.protocol; // returns 'http:'`
 
-Setter: `sluri.protocol = 'https';`
+> **setter**
+> 
+> `sluri.protocol = 'https';`
 
 ```
 slURI.username
 ```
-Getter: `sluri.username; // returns 'user'`
+> **getter**
+> 
+> `sluri.username; // returns 'user'`
 
-Setter: `sluri.username = 'newuser';`
+> **setter**
+> 
+> `sluri.username = 'newuser';`
 
 ```
 slURI.password
 ```
-Getter: `sluri.password; // returns 'pass'`
+> **getter**
+> 
+> `sluri.password; // returns 'pass'`
 
-Setter: `sluri.password = 'newpass';`
+> **setter**
+> 
+> `sluri.password = 'newpass';`
 
 ```
 slURI.hostname
 ```
-Getter: `sluri.hostname; // returns 'www.nateyolles.com'`
+> **getter**
+> 
+> `sluri.hostname; // returns 'www.nateyolles.com'`
 
-Setter: `sluri.hostname = 'www.example.com';`
+> **setter**
+> 
+> `sluri.hostname = 'www.example.com';`
 
 ```
 slURI.port
 ```
-Getter: `sluri.port; // returns '4502'`
+> **getter**
+> 
+> `sluri.port; // returns '4502'`
 
-Setter: `sluri.port = 4503;`
+> **setter**
+> 
+> `sluri.port = 4503;`
 
 ```
 slURI.host
 ```
-Getter: `sluri.host; // returns 'www.nateyolles.com:4502'`
+> **getter**
+> 
+> `sluri.host; // returns 'www.nateyolles.com:4502'`
 
-Setter: `sluri.host = 'www.example.com:4503';`
+> **setter**
+> 
+> `sluri.host = 'www.example.com:4503';`
 
 ```
 slURI.origin
 ```
-Getter: `sluri.origin; // returns 'http://www.nateyolles.com:4502'`
+> **getter**
+> 
+> `sluri.origin; // returns 'http://www.nateyolles.com:4502'`
 
-*read-only*
+> **setter**
+> 
+> *read-only*
 
 ```
 slURI.pathname
 ```
-Getter: `sluri.pathname; // returns '/us/en/page.biz.baz.html'`
+> **getter**
+> 
+> `sluri.pathname; // returns '/us/en/page.biz.baz.html'`
 
-Setter: `sluri.pathname = '/fr/fr/example.html';`
+> **setter**
+> 
+> `sluri.pathname = '/fr/fr/example.html';`
 
 ```
 slURI.resourcePath
 ```
-Getter: `sluri.resourcePath; // returns '/us/en/page'`
+> **getter**
+> 
+> `sluri.resourcePath; // returns '/us/en/page'`
 
-*read-only*
+> **setter**
+> 
+> *read-only*
 
 ```
 slURI.extension
 ```
-Getter: `sluri.extension; // returns 'html'`
+> **getter**
+> 
+> `sluri.extension; // returns 'html'`
 
-Setter: `sluri.extension = 'json';`
+> **setter** 
+> 
+> `sluri.extension = 'json';`
 
 ```
 slURI.selectorString
 ```
-Getter: `sluri.selectorString; // returns 'biz.baz'`
+> **getter**
+> 
+> `sluri.selectorString; // returns 'biz.baz'`
 
-Setter: `sluri.selectorString = 'foo.bar';`
+> **setter**
+> 
+> `sluri.selectorString = 'foo.bar';`
 
 ```
 slURI.search
 ```
-Getter: `sluri.search; // returns '?alpha=bravo&charlie=delta&echo'`
+> **getter**
+> 
+> `sluri.search; // returns '?alpha=bravo&charlie=delta&echo'`
 
-Setter: `sluri.search = '?foo=bar';`
+> **getter**
+> 
+> `sluri.search = '?foo=bar';`
 
 ```
 slURI.suffix
 ```
-Getter: `sluri.suffix; // returns '/foo/bar'`
+> **getter**
+> 
+> `sluri.suffix; // returns '/foo/bar'`
 
-Setter: `sluri.suffix = '/biz/baz';`
+> **setter**
+> 
+> `sluri.suffix = '/biz/baz';`
 
 ```
 slURI.hash
 ```
-Getter: `sluri.hash; // returns '#foxtrot'`
+> **getter**
+> 
+> `sluri.hash; // returns '#foxtrot'`
 
-Setter: `sluri.hash = 'foo';`
+> **setter**
+> 
+> `sluri.hash = 'foo';`
 
----
+```
+slURI.href
+```
+> **getter**
+> 
+> `sluri.href; // returns 'http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot'`
+
+> **setter**
+> 
+> `sluri.href = 'http://www.example.com/fr/fr/foo.html/bar/biz';`
+
+
+```
+slURI.toString()
+```
+> **returns {string}**
+> 
+> `sluri.toString(); // returns 'http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot'`
+
+### slURISelectors
 
 ```
 slURISelectors(selectorString)
@@ -156,36 +273,58 @@ Selectors are unique to *Apache Sling* and *Adobe Experience Manager*, as such t
 ```
 slURI.selectors
 ```
-Getter: `sluri.selectors; // returns instanceof slURISelectors`
+> **getter**
+> 
+> `sluri.selectors; // returns instanceof slURISelectors`
 
-*read-only*
+> **setter**
+> 
+> *read-only*
 
 ```
 slURI.selectors.toString()
 ```
-Returns: `sluri.selectors.toString(); // returns 'biz.baz'`
+> **returns {string}**
+> 
+> `sluri.selectors.toString(); // returns 'biz.baz'`
 
 ```
 slURI.selectors.has(selector)
 ```
-Returns: `sluri.selectors.has('biz'); // returns true`
+> **selector**
+>
+> The string to check the slURI object's selectors against
+
+> **returns {boolean}**
+> 
+> `sluri.selectors.has('biz'); // returns true`
 
 ```
 slURI.selectors.append(selector)
 ```
-Returns: `sluri.selectors.append('qux'); // sluri.selectorString === 'biz.baz.qux'`
+> **selector**
+>
+> The string to append to the slURI object's selectors
+
+> `sluri.selectors.append('qux'); // sluri.selectorString === 'biz.baz.qux'`
 
 ```
 slURI.selectors.delete(selector)
 ```
-Returns: `sluri.selectors.delete('biz'); // sluri.selectorString === 'baz'`
+> **selector**
+>
+> The string to delete from the slURI object's selectors
+
+> `sluri.selectors.delete('biz'); // sluri.selectorString === 'baz'`
 
 ```
 slURI.selectors.values()
 ```
-Returns: `sluri.selectors.values(); // returns ['biz', 'baz']`
+> **returns {array}**
+> 
+> `sluri.selectors.values(); // returns ['biz', 'baz']`
 
----
+### slURISearchParams
 
 ```
 slURISearchParams(searchString)
@@ -203,66 +342,86 @@ Handles multiple values for a given key in the querystring. There are many ways 
 ```
 slURI.searchParams
 ```
-Getter: `sluri.searchParams; // returns instanceof slURISearchParams`
+> **getter*
+> 
+> `sluri.searchParams; // returns instanceof slURISearchParams`
 
-*read-only*
+> **setter**
+> 
+> *read-only*
 
 ```
 slURI.searchParams.toString()
 ```
-Returns: `sluri.searchParams.toString(); // returns 'alpha=bravo&charlie=delta&echo'`
+> **returns {string}**
+> 
+> `sluri.searchParams.toString(); // returns 'alpha=bravo&charlie=delta&echo'`
 
 ```
 slURI.searchParams.has(key)
 ```
-Returns: `sluri.searchParams.has('alpha'); // returns true
+> **key**
+>
+> The parameter key to check against the querystring to see if it exists
+
+> **returns {boolean}**
+>
+> `sluri.searchParams.has('alpha'); // returns true
 
 ```
 slURI.searchParams.get(key)
 ```
-Returns: `sluri.searchParams.get('alpha'); // returns 'bravo'
+> **key**
+>
+> The parameter key to retrieve the querystring value
+
+> **returns {string}**
+>
+> `sluri.searchParams.get('alpha'); // returns 'bravo'
 
 ```
 slURI.searchParams.getAll(key)
 ```
-Returns: `sluri.searchParams.getAll('alpha'); // returns ['bravo']
+> **key**
+>
+> The parameter key to retrieve the querystring values
+
+> **returns {array}**
+>
+>  `sluri.searchParams.getAll('alpha'); // returns ['bravo']
 
 ```
 slURI.searchParams.keys()
 ```
-Returns: `sluri.searchParams.keys(); // returns ['alpha', 'charlie', 'echo']
+> **returns {array}**
+>
+> `sluri.searchParams.keys(); // returns ['alpha', 'charlie', 'echo']
 
 ```
 slURI.searchParams.values()
 ```
-Returns: `sluri.searchParams.values(); // returns ['bravo', 'delta', '']
+> **returns {array}**
+>
+>  `sluri.searchParams.values(); // returns ['bravo', 'delta', '']
 
 ```
 slURI.searchParams.set(key, value)
 ```
-Returns: `sluri.searchParams.set('alpha', 'golf'); // sluri.search === '?alpha=golf&charlie=delta&echo='
+> **key**
+>
+> The parameter key to set in the querystring
+
+> **value**
+>
+> The parameter value to set in the querystring for the key
+
+> `sluri.searchParams.set('alpha', 'golf'); // sluri.search === '?alpha=golf&charlie=delta&echo='
 
 ```
 slURI.searchParams.delete(key)
 ```
-Returns: `sluri.searchParams.set('alpha'); // sluri.search === '?charlie=delta&echo='
+> **key**
+>
+> The parameter key to delete from the querystring
 
-## Browser Compatibility
-
-Even though the URL API is listed as experimental, slURI does not depend on the browser's implementation of the API. slURI works on all modern browsers and Internet Explorer 9+.
-
-## Tests
-
-slURI tests are written with [Jasmine](http://jasmine.github.io/) and run on the PhantomJS headless browser. Tests are run with [CircleCI](https://circleci.com/)'s integration testing platform. Tests can be run locally with:
-
-```
-grunt test
-```
-
-## Build
-
-Build slURI with:
-
-```
-grunt build
-```
+> `sluri.searchParams.set('alpha'); // sluri.search === '?charlie=delta&echo='
