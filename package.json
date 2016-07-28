@@ -1,6 +1,6 @@
 {
   "name": "slURI",
-  "version": "0.1.0-alpha",
+  "version": "0.2.0",
   "description": "AEM and Apache Sling client-side URI manipulation including support for selectors and suffixes.",
   "main": "Gruntfile.js",
   "keywords": [
