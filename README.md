@@ -1,6 +1,6 @@
 # slURI: Sling URI Manipulation Library for AEM and Apache Sling
 
-[![slURI Build Status](https://circleci.com/gh/nateyolles/sluri.svg?style=shield "slURI Build Status")](https://circleci.com/gh/nateyolles/sluri.svg?style=shield) [![slURI License](https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat "slURI License")](https://github.com/nateyolles/sluri/blob/master/LICENSE)
+[![slURI Build Status](https://circleci.com/gh/nateyolles/sluri.svg?style=shield "slURI Build Status")](https://circleci.com/gh/nateyolles/sluri.svg?style=shield) [![GitHub version](https://badge.fury.io/gh/nateyolles%2Fsluri.svg)](https://badge.fury.io/gh/nateyolles%2Fsluri) [![Bower version](https://badge.fury.io/bo/sluri.svg)](https://badge.fury.io/bo/sluri) [![npm version](https://badge.fury.io/js/sluri.svg)](https://www.npmjs.com/package/sluri) [![Dependencies](https://david-dm.org/nateyolles/sluri.svg)](https://david-dm.org/nateyolles/sluri) [![slURI License](https://img.shields.io/badge/license-Apache_2.0-blue.svg?style=flat "slURI License")](https://github.com/nateyolles/sluri/blob/master/LICENSE)
 
 slURI is a client-side URI/URL manipulation library for [Adobe Experience Manager](http://www.adobe.com/marketing-cloud/enterprise-content-management.html) (AEM/CQ5) and [Apache Sling](https://sling.apache.org/). slURI is an implementation of the URL API (see the [Mozilla Developer Network: URL documentation](https://developer.mozilla.org/en-US/docs/Web/API/URL)) with considerations for the unique URL structure of AEM and Sling applications.
 
@@ -31,10 +31,23 @@ Include the provided JavaScript and simply instantiate slURI objects using the `
 
 #### Bower
 
-Install with [Bower](https://bower.io/):
+Install with Bower [Bower](https://bower.io/):
 
 ```
 bower install sluri
+```
+
+#### NPM
+
+Install with [NPM](https://www.npmjs.com/) ([https://www.npmjs.com/package/sluri](https://www.npmjs.com/package/sluri)):
+
+```
+npm install sluri --save
+```
+
+```javascript
+var slURI = require('sluri').slURI;
+var sluri = new slURI(urlString);
 ```
 
 #### Use JavaScript file
