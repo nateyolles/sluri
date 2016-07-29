@@ -4,7 +4,7 @@
     "Nate Yolles <nate@nateyolles.com> (http://www.nateyolles.com)"
   ],
   "description": "AEM and Apache Sling client-side URI manipulation including support for selectors and suffixes.",
-  "main": "src/sluri.js",
+  "main": "sluri.js",
   "moduleType": [
     "amd",
     "globals"
