@@ -115,7 +115,7 @@
      * many ways different web frameworks handle this. slURISearchParams takes
      * the same approach as the SearchParams interface that it is implementing.
      * An example of multiple values is: '?foo=red&bar=blue&foo=green'. Calling
-     * the #get method will return the first occurance, while calling the
+     * the #get method will return the first occurrence, while calling the
      * #getAll method will return an array of all values. Calling the #set
      * method with remove all values and create the new one. Calling #delete
      * will remove all values. The #append method is how multiple values can be
@@ -520,7 +520,7 @@
 
         /**
          * Determines if a URL string is formatted in a way that it can become a
-         * slURI. Essentially that means the string starts with a protocal such
+         * slURI. Essentially that means the string starts with a protocol such
          * as "http://".
          *
          * @private

@@ -6,7 +6,7 @@ slURI is a client-side URI/URL manipulation library for [Adobe Experience Manage
 
 An AEM/Sling URI could look something like `http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie`. See the documentation for [Apache Sling URL decomposition](https://sling.apache.org/documentation/the-sling-engine/url-decomposition.html).
 
-Instead of writing repetative and tedious string manipulation such as:
+Instead of writing repetitive and tedious string manipulation such as:
 
 ```javascript
 qs += (qs.indexOf('?') === -1 ? '?' : '&') + key + '=' + value;
@@ -18,6 +18,9 @@ slURI allows you to write:
 ```javascript
 sluri.searchParams.append(key, value);
 sluri.suffix = '/foo/bar';
+sluri.selectors.append('foo');
+sluri.selectors.delete('bar');
+sluri.extension = 'json';
 ```
 
 ## Using slURI
@@ -343,7 +346,7 @@ The *slURI* implementation of the *URLSearchParams* interface.
 
 Allows easy access to create, read, update and delete querystring parameters without having to resort to manual string manipulation.
 
-Handles multiple values for a given key in the querystring. There are many ways different web frameworks handle this. *slURISearchParams* takes the same approach as the *SearchParams* interface that it is implementing. An example of multiple values is: *?foo=red&bar=blue&foo=green*. Calling the *#get* method will return the first occurance, while calling the *#getAll* method will return an array of all values. Calling the *#set* method with remove all values and create the new one. Calling *#delete* will remove all values. The *#append* method is how multiple values can be added to the querystring.
+Handles multiple values for a given key in the querystring. There are many ways different web frameworks handle this. *slURISearchParams* takes the same approach as the *SearchParams* interface that it is implementing. An example of multiple values is: *?foo=red&bar=blue&foo=green*. Calling the *#get* method will return the first occurrence, while calling the *#getAll* method will return an array of all values. Calling the *#set* method with remove all values and create the new one. Calling *#delete* will remove all values. The *#append* method is how multiple values can be added to the querystring.
 
 > **searchString**
 > 

@@ -1,8 +1,8 @@
 {
   "name": "sluri",
-  "version": "0.3.0",
-  "description": "AEM and Apache Sling client-side URI manipulation including support for selectors and suffixes.",
-  "main": "Gruntfile.js",
+  "version": "0.3.1",
+  "description": "AEM and Apache Sling client-side URI manipulation including support for selectors, suffixes, resourcePath and extentions.",
+  "main": "sluri.js",
   "keywords": [
     "Adobe Experience Manager",
     "AEM",
@@ -20,10 +20,6 @@
   },
   "homepage": "https://github.com/nateyolles/sluri",
   "license": "Apache-2.0",
-  "dependencies": {
-    "grunt-template-jasmine-requirejs": "~0.2.3",
-    "phantomjs-prebuilt": "~2.1.8"
-  },
   "engines": {
     "node": "5.5.0"
   },
@@ -40,6 +36,8 @@
     "grunt-bower-requirejs": "~2.0.0",
     "grunt-contrib-jasmine": "~1.0.3",
     "grunt-contrib-jshint": "~1.0.0",
-    "grunt-contrib-uglify": "~2.0.0"
+    "grunt-contrib-uglify": "~2.0.0",
+    "grunt-template-jasmine-requirejs": "~0.2.3",
+    "phantomjs-prebuilt": "~2.1.8"
   }
 }
