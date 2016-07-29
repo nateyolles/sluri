@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
     conf: {
-      src: 'src'
+      dist: 'dist'
     },
     banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -20,8 +20,8 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       dist: {
-        src: 'src/sluri.js',
-        dest: 'dist/sluri.min.js'
+        src: 'sluri.js',
+        dest: '<%=conf.dist%>/sluri.min.js'
       }
     },
     jshint: {
@@ -33,9 +33,9 @@ module.exports = function(grunt) {
       },
       src: {
         options: {
-          jshintrc: '<%=conf.src%>/.jshintrc'
+          jshintrc: '.jshintrc'
         },
-        src: '<%=conf.src%>/sluri.js'
+        src: 'sluri.js'
       }
     },
     jasmine: {
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
           // }
       },
       spec: {
-          src: '<%=conf.src%>/*.js',
+          src: 'sluri.js',
           options: {
               keepRunner: true,
               outfile: 'tests.html'

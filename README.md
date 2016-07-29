@@ -31,12 +31,22 @@ Include the provided JavaScript and simply instantiate slURI objects using the `
 Install with [Bower](https://bower.io/):
 
 ```
-bower install slURI
+bower install sluri
 ```
 
 #### Use JavaScript file
 
 Include the minified distribution file [/dist/sluri.min.js](https://github.com/nateyolles/sluri/blob/master/dist/sluri.min.js) or the expanded development file [/src/sluri.js](https://github.com/nateyolles/sluri/blob/master/src/sluri.js) in your project.
+
+If required, setup your RequireJS `config.js` file with the slURI dependency:
+
+```javascript
+require.config({
+    paths: {
+        slURI: 'bower_components/sluri/sluri'
+    }
+});
+```
 
 #### Browser Compatibility
 
