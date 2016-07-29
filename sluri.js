@@ -106,23 +106,6 @@
         ERROR_MESSAGE = 'Failed to construct \'URL\': Invalid URL';
 
     /**
-     * Determine if the browser supports getting the username and password from
-     * an HTMLAnchorElement of which PhantomJS does not.
-     *
-     * @private
-     * @member {Boolean}
-     * @todo Remove this function, write a PhantomJS polyfill, exclude this from
-     *     the build, or change the base functionality from parsing with the DOM
-     *     to using a regular expression.
-     */
-    var supportUserPass = (function() {
-        var link = document.createElement('a');
-        link.href = 'http://user:pass@www.foo.com';
-
-        return link.username === 'user' && link.password === 'pass';
-    })();
-
-    /**
      * The slURI implementation of the URLSearchParams interface.
      *
      * Allows easy access to create, read, update and delete querystring
@@ -553,15 +536,18 @@
          * Determines if an object is a URL type of object such as Location,
          * HTMLAnchorElement, URL or slURI.
          *
+         * Test if objects exist so that this can run in any browser or Node
+         * environment.
+         *
          * @private
          * @function
          * @param {object} the object to test
          * @returns {Boolean}
          */
         function isURLObject(url) {
-            return url instanceof Location ||
-                    url instanceof slURI ||
-                    url instanceof HTMLAnchorElement ||
+            return url instanceof slURI ||
+                    (typeof Location !== 'undefined' && url instanceof Location) ||
+                    (typeof HTMLAnchorElement !== 'undefined' && url instanceof HTMLAnchorElement) ||
                     (typeof URL !== 'undefined' && url instanceof URL);
         }
 
@@ -598,8 +584,6 @@
          * @function
          * @param {String} the href string to deconstruct
          * @returns {object}
-         * @todo Decide on whether to retain URL string parsing through the DOM
-         *     or replace this with a regular expression and matching groups.
          */
         function deconstructPathname(href) {
             var pathParts,
@@ -647,62 +631,60 @@
          * host, hostname, port, etc...as well as the addition of Sling URL
          * components such as resourcePath, selectorString, and suffix.
          *
+         * The regular expression was taken from
+         * {@link http://stackoverflow.com/a/24527267/3022863} while the
+         * pathname, selectorString, resourcePath, extension and suffix are
+         * determined by string manipulation similar to how Apache Sling's
+         * SlingRequestPathInfo does it.
+         *
          * @private
          * @function
          * @param {String} the URL string to deconstruct
          * @returns {object}
          */
         function deconstructURLString(urlString) {
-            /**
-             * The regex used to find the username and password from the URL
-             * string.
-             *
-             * @todo Either remove when PhantomJS polyfill is created, simplify
-             *     to only search for username and password, or expand to handle
-             *     Sling URLs and remove the URL parsing with the DOM Anchor
-             *     tag.
-             */
-            var urlRegex = /^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/;
-
-            var link,
+            var urlRegex,
+                matches,
+                origin,
+                protocol,
                 username,
                 password,
-                pathParts,
-                matches;
+                hostname,
+                port,
+                pathnameSelectorsSuffix,
+                search,
+                hash,
+                pathnameParts;
 
-            link = document.createElement('a');
-            link.href = urlString;
+            urlRegex = new RegExp(/^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/);
+            matches = urlRegex.exec(urlString);
 
-            pathParts = deconstructPathname(link.pathname);
+            origin = matches[1] || '';
+            protocol = matches[2] || '';
+            username = matches[3] || '';
+            password = matches[4] || '';
+            hostname = matches[6] || '';
+            port = matches[7] || '';
+            pathnameSelectorsSuffix = matches[8] || '';
+            search = matches[9] || '';
+            hash = matches[10] || '';
 
-            /*
-             * @todo Remove this function, write a PhantomJS polyfill, exclude
-             *     this from the build, or change the base functionality from
-             *     parsing with the DOM to using a regular expression.
-             */
-            if (supportUserPass) {
-                username = link.username;
-                password = link.password;
-            } else {
-                matches = urlRegex.exec(urlString);
-                username = matches[3] || EMPTY_STRING;
-                password = matches[4] || EMPTY_STRING;
-            }
+            pathnameParts = deconstructPathname(pathnameSelectorsSuffix);
 
             return {
-                protocol : link.protocol,
+                protocol : protocol,
                 username : username,
                 password : password,
-                hostname : link.host,
-                port : link.port,
-                origin: link.origin,
-                pathname : pathParts.pathname,
-                resourcePath : pathParts.resourcePath,
-                selectorString : pathParts.selectorString,
-                extension : pathParts.extension,
-                suffix : pathParts.suffix,
-                search : link.search,
-                hash : link.hash
+                hostname : hostname,
+                port : port,
+                origin : origin,
+                pathname : pathnameParts.pathname,
+                resourcePath : pathnameParts.resourcePath,
+                selectorString : pathnameParts.selectorString,
+                extension : pathnameParts.extension,
+                suffix : pathnameParts.suffix,
+                search : search,
+                hash : hash
             };
         }
 
@@ -710,10 +692,8 @@
          * Assign the deconstructed parts to internal properties.
          *
          * @param {object}
-         * @todo clean this up
          */
         function asignPartsToSelf(_parts) {
-            //extend(_self, _parts);
             _self.protocol = _parts.protocol;
             _self.username = _parts.username;
             _self.password = _parts.password;
@@ -728,60 +708,46 @@
         }
 
         /**
-         * Extend and object with another object.
+         * Create the URL parts based on the instantiated object.
          *
-         * @function
-         * @private
-         * @param {object} The base object
-         * @param {object} The extension object
-         * @returns {object} The extended base object
-         */
-        // function extend(a, b) {
-        //     for (var key in b) {
-        //         if (b.hasOwnProperty(key)) {
-        //             a[key] = b[key];
-        //         }
-        //     }
-
-        //     return a;
-        // }
-
-        /*
          * urlString must be a String or a URL, slURI, window.location or
          * HTMLAnchorElement. If it's a String, it must start with a protocol.
-         * @todo: clean this up
+         *
+         * @private
+         * @function
+         * @throws {TypeError} if not a valid URL
+         * @todo: more checking for valid URL structures
          */
-        if (typeof urlString === 'string') {
-            if (urlString.indexOf('/') === 0) {
-                if (baseURL) {
-                    var baseOrigin,
-                        deconstructedBaseURL;
+        function createParts() {
+            var baseOrigin,
+                deconstructedBaseURL;
 
-                    if (isURLObject(baseURL)) {
-                        baseOrigin = baseURL.origin;
-                    } else {
-                        deconstructedBaseURL = deconstructURLString(baseURL);
-                        baseOrigin = deconstructedBaseURL.hostname && deconstructedBaseURL.origin;
-                    }
+            if (typeof urlString === 'string') {
+                if (urlString.indexOf('/') === 0) {
+                    if (baseURL) {
+                        if (isURLObject(baseURL)) {
+                            baseOrigin = baseURL.origin;
+                        } else {
+                            deconstructedBaseURL = deconstructURLString(baseURL);
+                            baseOrigin = deconstructedBaseURL.hostname && deconstructedBaseURL.origin;
+                        }
 
-                    if (baseOrigin) {
-                        urlString = baseOrigin + urlString;
-                        _parts = deconstructURLString(urlString);
-                    } else {
-                        throw new TypeError(ERROR_MESSAGE);
+                        if (baseOrigin) {
+                            urlString = baseOrigin + urlString;
+                            _parts = deconstructURLString(urlString);
+                        }
                     }
-                } else {
-                    throw new TypeError(ERROR_MESSAGE);
+                } else if (constructableURL(urlString)) {
+                    _parts = deconstructURLString(urlString);
                 }
-            } else if (constructableURL(urlString)) {
-                _parts = deconstructURLString(urlString);
-            } else {
+            } else if (isURLObject(urlString)) {
+                _parts = deconstructURLString(urlString.href);
+            }
+
+            /* Could not deconstructURL */
+            if (!_parts) {
                 throw new TypeError(ERROR_MESSAGE);
             }
-        } else if (isURLObject(urlString)) {
-            _parts = deconstructURLString(urlString.href);
-        } else {
-            throw new TypeError(ERROR_MESSAGE);
         }
 
         /**
@@ -1228,6 +1194,7 @@
         });
 
         /* Assign parts to self on instantiation */
+        createParts();
         asignPartsToSelf(_parts);
     };
 
