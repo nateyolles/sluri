@@ -31,7 +31,7 @@ Include the provided JavaScript and simply instantiate slURI objects using the `
 
 #### Bower
 
-Install with Bower [Bower](https://bower.io/):
+Install with [Bower](https://bower.io/):
 
 ```
 bower install sluri
@@ -368,7 +368,7 @@ Handles multiple values for a given key in the querystring. There are many ways 
 ```
 slURI.searchParams
 ```
-> **getter*
+> **getter**
 > 
 > `sluri.searchParams; // returns instanceof slURISearchParams`
 
@@ -392,7 +392,7 @@ slURI.searchParams.has(key)
 
 > **returns {boolean}**
 >
-> `sluri.searchParams.has('alpha'); // returns true
+> `sluri.searchParams.has('alpha'); // returns true`
 
 ```
 slURI.searchParams.get(key)
@@ -403,7 +403,7 @@ slURI.searchParams.get(key)
 
 > **returns {string}**
 >
-> `sluri.searchParams.get('alpha'); // returns 'bravo'
+> `sluri.searchParams.get('alpha'); // returns 'bravo'`
 
 ```
 slURI.searchParams.getAll(key)
@@ -414,21 +414,21 @@ slURI.searchParams.getAll(key)
 
 > **returns {array}**
 >
->  `sluri.searchParams.getAll('alpha'); // returns ['bravo']
+>  `sluri.searchParams.getAll('alpha'); // returns ['bravo']`
 
 ```
 slURI.searchParams.keys()
 ```
 > **returns {array}**
 >
-> `sluri.searchParams.keys(); // returns ['alpha', 'charlie', 'echo']
+> `sluri.searchParams.keys(); // returns ['alpha', 'charlie', 'echo']`
 
 ```
 slURI.searchParams.values()
 ```
 > **returns {array}**
 >
->  `sluri.searchParams.values(); // returns ['bravo', 'delta', '']
+>  `sluri.searchParams.values(); // returns ['bravo', 'delta', '']`
 
 ```
 slURI.searchParams.set(key, value)
@@ -441,7 +441,7 @@ slURI.searchParams.set(key, value)
 >
 > The parameter value to set in the querystring for the key
 
-> `sluri.searchParams.set('alpha', 'golf'); // sluri.search === '?alpha=golf&charlie=delta&echo='
+> `sluri.searchParams.set('alpha', 'golf'); // sluri.search === '?alpha=golf&charlie=delta&echo='`
 
 ```
 slURI.searchParams.delete(key)
@@ -450,4 +450,4 @@ slURI.searchParams.delete(key)
 >
 > The parameter key to delete from the querystring
 
-> `sluri.searchParams.set('alpha'); // sluri.search === '?charlie=delta&echo='
+> `sluri.searchParams.set('alpha'); // sluri.search === '?charlie=delta&echo='`
