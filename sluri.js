@@ -112,10 +112,52 @@
         ERROR_MESSAGE = 'Failed to construct \'URL\': Invalid URL';
 
     /**
+     * Encode URI string to RFC 3986 specification
+     *
+     * Replace all characters except the following with the appropriate UTF-8
+     * escape sequences:
+     *
+     *   Reserved characters     ; , / ? : @ & = + $
+     *   Unescaped characters    alphabetic, decimal digits, - _ . ! ~ * ' ( )
+     *   Number sign             #
+     *
+     * @function
+     * @private
+     * @param {string} The string to encode
+     * @returns {string} The encoded string
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI}
+     */
+    function fixedEncodeURI(str) {
+        return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
+    }
+
+    /**
+     * Encode URI component string to RFC 3986 specification
+     *
+     * Escapes all characters except the following:
+     * 
+     *   alphabetic, decimal digits, - _ . ! ~ * ' ( )
+     *
+     * @function
+     * @private
+     * @param {string} The string to encode
+     * @returns {string} The encoded string
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent}
+     */
+    function fixedEncodeURIComponent(str) {
+        return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+            return '%' + c.charCodeAt(0).toString(16);
+        });
+    }
+
+    /**
      * The slURI implementation of the URLSearchParams interface.
      *
      * Allows easy access to create, read, update and delete querystring
      * parameters without having to resort to manual string manipulation.
+     *
+     * Encode the key-value pairs only on when toString is called so that keys
+     * and values can be retrieved and set by the values as entered.
      *
      * Handles multiple values for a given key in the querystring. There are
      * many ways different web frameworks handle this. slURISearchParams takes
@@ -174,7 +216,8 @@
             var valueArray = [];
 
             for (var x = 0; x < _valueDictionary.length; x++) {
-                valueArray.push(_valueDictionary[x].key + '=' + _valueDictionary[x].value);
+                valueArray.push(fixedEncodeURIComponent(_valueDictionary[x].key) + 
+                    '=' + fixedEncodeURIComponent(_valueDictionary[x].value));
             }
 
             return valueArray.length > 0 ? valueArray.join('&') : EMPTY_STRING;
@@ -403,7 +446,7 @@
          * sluri.selectors.toString(); //returns 'foo.bar'
          */
         this.toString = function() {
-            return _values.join('.');
+            return fixedEncodeURI(_values.join('.'));
         };
 
         /**
@@ -505,8 +548,9 @@
             _password,
             _hostname,
             _port,
-            _pathname,
+            _resourcePath,
             _selectors,
+            _extension,
             _suffix,
             _searchParams,
             _hash;
@@ -533,9 +577,10 @@
          * @function
          * @param {String} the URL string to test
          * @returns {Boolean}
+         * @see {@link https://url.spec.whatwg.org/#url-syntax}
          */
-        function constructableURL(href) {
-            return /^\w+:\/\//.test(href);
+        function isValidProtocol(str) {
+            return /^[a-zA-Z][a-zA-Z0-9+\.-]+:\/\//.test(str);
         }
 
         /**
@@ -565,6 +610,7 @@
          * @example
          * // returns '54.67.97.95'
          * integerToIPAddress(910385503)
+         * @param {number} The integer to convert to an IP address
          * @returns {String} The IP Address converted from an integer
          * @see {@link http://stackoverflow.com/a/8105740/3022863}
          */
@@ -588,7 +634,7 @@
          *
          * @private
          * @function
-         * @param {String} the href string to deconstruct
+         * @param {string} the href string to deconstruct
          * @returns {object}
          */
         function deconstructPathname(href) {
@@ -637,8 +683,10 @@
          * host, hostname, port, etc...as well as the addition of Sling URL
          * components such as resourcePath, selectorString, and suffix.
          *
-         * The regular expression was taken from
-         * {@link http://stackoverflow.com/a/24527267/3022863} while the
+         * The regular expression was modified from
+         * {@link http://stackoverflow.com/a/24527267/3022863} in accordance
+         * with RFC 3986 including the allowance of square brackets.
+         *
          * pathname, selectorString, resourcePath, extension and suffix are
          * determined by string manipulation similar to how Apache Sling's
          * SlingRequestPathInfo does it.
@@ -662,9 +710,8 @@
                 hash,
                 pathnameParts;
 
-            urlRegex = new RegExp(/^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?\]\[]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/);
+            urlRegex = new RegExp(/^(?:(?:(([^:\/#\?]+:)?(?:(?:\/\/)(?:(?:(?:([^:@\/#\?]+)(?:\:([^:@\/#\?]*))?)@)?(([^:\/#\?]+|\[[^\/\]@#?]+\])(?:\:([0-9]+))?))?)?)?((?:\/?(?:[^\/\?#]+\/+)*)(?:[^\?#]*)))?(\?[^#]+)?)(#.*)?/);
             matches = urlRegex.exec(urlString);
-
             origin = matches[1] || '';
             protocol = matches[2] || '';
             username = matches[3] || '';
@@ -699,18 +746,18 @@
          *
          * @param {object}
          */
-        function asignPartsToSelf(_parts) {
-            _self.protocol = _parts.protocol;
-            _self.username = _parts.username;
-            _self.password = _parts.password;
-            _self.hostname = _parts.hostname;
-            _self.port = _parts.port;
-            _self.resourcePath = _parts.resourcePath;
-            _pathname = _parts.pathname;
-            _self.selectorString = _parts.selectorString;
-            _self.suffix = _parts.suffix;
-            _self.search = _parts.search;
-            _self.hash = _parts.hash;
+        function asignPartsToSelf(parts) {
+            _self.protocol = parts.protocol;
+            _self.username = parts.username;
+            _self.password = parts.password;
+            _self.hostname = parts.hostname;
+            _self.port = parts.port;
+            _resourcePath = fixedEncodeURI(parts.resourcePath);
+            _self.selectorString = parts.selectorString;
+            _extension = fixedEncodeURI(parts.extension);
+            _self.suffix = parts.suffix;
+            _self.search = parts.search;
+            _self.hash = parts.hash;
         }
 
         /**
@@ -743,7 +790,7 @@
                             _parts = deconstructURLString(urlString);
                         }
                     }
-                } else if (constructableURL(urlString)) {
+                } else if (isValidProtocol(urlString)) {
                     _parts = deconstructURLString(urlString);
                 }
             } else if (isURLObject(urlString)) {
@@ -780,7 +827,7 @@
                     return _protocol || EMPTY_STRING;
                 },
                 set: function(value) {
-                    if (value && /^[A-Za-z-]+:?$/.test(value)) {
+                    if (value && /^[a-zA-Z][a-zA-Z0-9+\.-]+:?$/.test(value)) {
                         _protocol = value.substr(-1) === ':' ? value : value + ':';
                     }
                 }
@@ -803,7 +850,7 @@
                     return _username || EMPTY_STRING;
                 },
                 set: function(value) {
-                    _username = EMPTY_STRING + value;
+                    _username = fixedEncodeURI(EMPTY_STRING + value);
                 }
             },
 
@@ -824,7 +871,7 @@
                     return _password || EMPTY_STRING;
                 },
                 set: function(value) {
-                    _password = EMPTY_STRING + value;
+                    _password = fixedEncodeURI(EMPTY_STRING + value);
                 }
             },
 
@@ -849,7 +896,11 @@
                         if (!isNaN(value)) {
                             _hostname = integerToIPAddress(value);
                         } else {
-                            _hostname = value.split(':')[0];
+                            /*
+                             * Ignore the port number if it's trying to be set
+                             * here.
+                             */
+                            _hostname = fixedEncodeURI(value.split(':')[0]);
                         }
                     }
                 }
@@ -957,19 +1008,30 @@
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    return _pathname || '/';
+                    var pathname;
+
+                    if (_resourcePath && _resourcePath !== '/') {
+                        pathname = _resourcePath;
+
+                        if (this.selectorString) {
+                            pathname += '.' + this.selectorString;
+                        }
+
+                        if (_extension) {
+                            pathname += '.' + _extension;
+                        }
+                    }
+
+                    return pathname || '/';
                 },
                 set: function(value) {
                     var pathParts;
 
                     if (!null && !undefined) {
                         pathParts = deconstructPathname(value);
-                        _pathname = pathParts.pathname;
+                        _resourcePath = fixedEncodeURI(pathParts.resourcePath);
+                        _extension = fixedEncodeURI(pathParts.extension);
                         this.selectorString = pathParts.selectorString;
-
-                        if (pathParts.pathname && pathParts.pathname.indexOf('/') === -1) {
-                            this.suffix = '';
-                        }
                     }
                 }
             },
@@ -980,7 +1042,6 @@
              *
              * @public
              * @member
-             * @readonly
              * @returns {String}
              * @example
              * sluri.resourcePath; // returns '/us/en/page'
@@ -989,10 +1050,12 @@
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    return this.pathname.split('.')[0];
+                    return _resourcePath;
                 },
-                set: function() {
-                    /* read-only */
+                set: function(value) {
+                    if (value !== null && value !== undefined) {
+                        _resourcePath = fixedEncodeURI(value);
+                    }
                 }
             },
 
@@ -1010,7 +1073,7 @@
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    return this.selectors.values() ? this.selectors.values().join('.') : EMPTY_STRING;
+                    return this.selectors.toString();
                 },
                 set: function(value) {
                     if (value !== null && value !== undefined) {
@@ -1056,11 +1119,15 @@
                 enumerable : true,
                 configurable : true,
                 get: function() {
-                    return this.pathname.indexOf('.') === -1 ? EMPTY_STRING : this.pathname.substr(this.pathname.lastIndexOf('.') + 1);
+                    return _extension || '';
                 },
                 set: function(value) {
-                    if (value && this.pathname && this.pathname.indexOf('.') !== -1) {
-                        this.pathname = this.pathname.substr(0, this.pathname.lastIndexOf('.') + 1) + value;
+                    /*
+                     * If the pathname has an extension, do a replacement with
+                     * the new value.
+                     */
+                    if (_extension && value) {
+                        _extension = fixedEncodeURI(value);
                     }
                 }
             },
@@ -1083,7 +1150,7 @@
                 },
                 set: function(value) {
                     if (value !== null && value !== undefined) {
-                        _suffix = value;
+                        _suffix = fixedEncodeURI(value);
                     }
                 }
             },
@@ -1137,6 +1204,8 @@
 
             /**
              * Getter and setter for the URL hash.
+             *
+             * Don't encode the hash value
              *
              * @public
              * @member

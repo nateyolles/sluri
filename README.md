@@ -6,6 +6,8 @@ slURI is a client-side URI/URL manipulation library for [Adobe Experience Manage
 
 An AEM/Sling URI could look something like `http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie`. See the documentation for [Apache Sling URL decomposition](https://sling.apache.org/documentation/the-sling-engine/url-decomposition.html).
 
+slURI encodes the URL string according to [RFC 3986](https://tools.ietf.org/html/rfc3986).
+
 Instead of writing repetitive and tedious string manipulation such as:
 
 ```javascript
@@ -221,7 +223,7 @@ slURI.resourcePath
 
 > **setter**
 > 
-> *read-only*
+> `sluri.resourcePath = '/fr/fr/example';`
 
 ```
 slURI.extension

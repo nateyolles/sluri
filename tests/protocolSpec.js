@@ -29,14 +29,44 @@
       expect(sluri.protocol).toBe('ftp:');
     });
 
-    it('should not update the protocol with numbers or special characters', function() {
+    it('should not update the protocol with special characters', function() {
       var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.protocol).toBe('http:');
 
-      sluri.protocol = 'alpha9';
+      sluri.protocol = 'alpha%';
       expect(sluri.protocol).toBe('http:');
 
       sluri.protocol = 'al_pha';
+      expect(sluri.protocol).toBe('http:');
+    });
+
+    it('should update the protocol even with "+", "-" or "."', function() {
+      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      expect(sluri.protocol).toBe('http:');
+
+      sluri.protocol = 'al+pha';
+      expect(sluri.protocol).toBe('al+pha:');
+
+      sluri.protocol = 'al-pha';
+      expect(sluri.protocol).toBe('al-pha:');
+
+      sluri.protocol = 'al.pha';
+      expect(sluri.protocol).toBe('al.pha:');
+    });
+
+    it('should update the protocol with numbers if not in the first position', function() {
+      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      expect(sluri.protocol).toBe('http:');
+
+      sluri.protocol = 'al9pha';
+      expect(sluri.protocol).toBe('al9pha:');
+    });
+
+    it('should not update the protocol with numbers in the first position', function() {
+      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      expect(sluri.protocol).toBe('http:');
+
+      sluri.protocol = '9alpha';
       expect(sluri.protocol).toBe('http:');
     });
 

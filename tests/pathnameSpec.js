@@ -33,6 +33,16 @@
       expect(sluri.extension).toBe('html');
     });
 
+    it('should update the pathname when selectors are updated', function() {
+      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
+
+      sluri.selectors.append('qux');
+      expect(sluri.pathname).toBe('/us/en/page.foo.bar.qux.html');
+      expect(sluri.selectorString).toBe('foo.bar.qux');
+      expect(sluri.extension).toBe('html');
+    });
+
     it('should update the pathname with a slash', function() {
       var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
