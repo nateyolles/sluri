@@ -39,5 +39,6 @@
     "grunt-contrib-uglify": "~2.0.0",
     "grunt-template-jasmine-requirejs": "~0.2.3",
     "phantomjs-prebuilt": "~2.1.8"
-  }
+  },
+  "tonicExampleFilename" : "example.js"
 }
