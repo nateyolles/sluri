@@ -25,7 +25,7 @@ sluri.extension = 'json';
 
 ## Using slURI
 
-slURI can be be used as a global or with [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) and an AMD loader such as [RequireJS](http://requirejs.org/) or [Almond](https://github.com/requirejs/almond).
+slURI can be be used in three ways: as a global, with [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) and an AMD loader such as [RequireJS](http://requirejs.org/) or [Almond](https://github.com/requirejs/almond), or in CommonJS-like environments that support `module.exports` such as [Node](https://nodejs.org) or [Grunt](http://gruntjs.com/).
 
 Include the provided JavaScript and simply instantiate slURI objects using the `new` keyword.
 
@@ -33,26 +33,27 @@ Include the provided JavaScript and simply instantiate slURI objects using the `
 
 Install with [Bower](https://bower.io/):
 
-```
-bower install sluri
+```bash
+bower install sluri --save
 ```
 
 #### NPM
 
 Install with [NPM](https://www.npmjs.com/) ([https://www.npmjs.com/package/sluri](https://www.npmjs.com/package/sluri)):
 
-```
+```bash
 npm install sluri --save
 ```
 
-```javascript
-var slURI = require('sluri').slURI;
-var sluri = new slURI(urlString);
-```
-
-#### Use JavaScript file
+#### Global
 
 Include the minified distribution file [/dist/sluri.min.js](https://github.com/nateyolles/sluri/blob/master/dist/sluri.min.js) or the expanded development file [/src/sluri.js](https://github.com/nateyolles/sluri/blob/master/src/sluri.js) in your project.
+
+```javascript
+var sluri = new slURI('http://www.nateyolles.com/us/page.foo.bar.html/alpha/bravo');
+```
+
+#### RequireJS
 
 If required, setup your RequireJS `config.js` file with the slURI dependency:
 
@@ -62,6 +63,19 @@ require.config({
         slURI: 'bower_components/sluri/sluri'
     }
 });
+```
+
+```javascript
+require(['sluri'], function(slURI) {
+    var sluri = new slURI('http://www.nateyolles.com/us/page.foo.bar.html/alpha/bravo');
+});
+```
+
+#### CommonJS
+
+```javascript
+var slURI = require('sluri');
+var sluri = new slURI('http://www.nateyolles.com/us/page.foo.bar.html/alpha/bravo');
 ```
 
 #### Browser Compatibility

@@ -77,8 +77,9 @@
  * var sluri = new slURI(barString, window.location); // sluri.href ==='http://www.currentsite.com/bar.html'
  *
  * This script is in a UMD (Universal Module Definition) pattern allowing the
- * script to be used as a global or as an AMD (Asynchronous Module Definition)
- * module with the use of an AMD loader such as RequireJS or Almond.
+ * script to be used as a global, an AMD (Asynchronous Module Definition)
+ * module with the use of an AMD loader such as RequireJS or Almond, or CommonJS
+ * like environments such as Node.
  *
  * @module slURI
  * @author Nate Yolles <nate@nateyolles.com>
@@ -86,7 +87,7 @@
  * @license Apache-2.0
  * @implements {URL}
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URL} for URL interface
- * @see {@link https://github.com/umdjs/umd/blob/master/templates/amdWeb.js} for UMD boilerplate
+ * @see {@link https://github.com/umdjs/umd/blob/master/templates/returnExports.js} for UMD boilerplate
  */
 (function (root, factory) {
     'use strict';
@@ -94,6 +95,11 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
     } else {
         // Browser globals
         root.slURI = factory();
