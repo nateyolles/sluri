@@ -10,7 +10,7 @@ Instead of writing repetitive and tedious string manipulation such as:
 
 ```javascript
 qs += (qs.indexOf('?') === -1 ? '?' : '&') + key + '=' + value;
-url = path.split('.html')[0] + '/foo/bar' + path.split('.html')[1];
+url = path.split('.html')[0] + selectors + '.html';
 ```
 
 slURI allows you to write:
