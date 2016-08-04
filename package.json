@@ -28,8 +28,7 @@
     "url": "https://git@git.corp.adobe.com:nateyolles/sluri.git"
   },
   "scripts": {
-    "test": "grunt test",
-    "prepublish": "example"
+    "test": "grunt test"
   },
   "devDependencies": {
     "bower": "~1.7.9",
