@@ -306,7 +306,7 @@ SLURISelectors(selectorString)
 ```
 Allows easy access to create, read, update and delete the selectors without having to resort to manual string manipulation.
 
-Selectors are unique to *Apache Sling* and *Adobe Experience Manager*, as such there isn't an interface to implement. However, the *SLURISelectors* API matches the *slURLSearchParams* API and *URLSearchParams* interface as closely as possible.
+Selectors are unique to *Apache Sling* and *Adobe Experience Manager*, as such there isn't an interface to implement. However, the *SLURISelectors* API matches the *SLURISearchParams* API and *URLSearchParams* interface as closely as possible.
 
 > **selectorString**
 > 
