@@ -776,6 +776,10 @@
                 deconstructedBaseURL;
 
             if (typeof urlString === 'string') {
+                /*
+                 * If path is relative, try to get the origin from the base,
+                 * otherwise throw a TypeError.
+                 */
                 if (urlString.indexOf('/') === 0) {
                     if (baseURL) {
                         if (isURLObject(baseURL)) {

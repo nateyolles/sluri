@@ -40,7 +40,8 @@ module.exports = function(grunt) {
     },
     jasmine: {
       options: {
-          specs: 'tests/**/*Spec.js'
+          helpers: 'tests/helpers/**/*.js',
+          specs: 'tests/specs/**/*Spec.js'
           // ,
           // styles:['<%=conf.dist%>/css/<%=pkg.name%>.css'],
           // template: require('grunt-template-jasmine-requirejs'),

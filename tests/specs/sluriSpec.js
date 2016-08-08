@@ -31,12 +31,18 @@
       expect(sluri.href).toBe('http://www.nateyolles.com/us/en/page.html');
     });
 
-    // TODO: Isn't getting baseURL.origin
-    // it('should instantiate with a relative path and a URL baseURL object', function() {
-    //   var baseURL = new URL('http://www.nateyolles.com/fr/fr/index.html');
-    //   var sluri = new slURI('/us/en/page.html', baseURL);
-    //   expect(sluri.href).toBe('http://www.nateyolles.com/us/en/page.html');
-    // });
+    /* Requires URL polyfill for phantom */
+    it('should instantiate with a relative path and a URL baseURL object', function() {
+      var baseURL = new URL('http://www.nateyolles.com/fr/fr/index.html');
+      var sluri = new slURI('/us/en/page.html', baseURL);
+      expect(sluri.href).toBe('http://www.nateyolles.com/us/en/page.html');
+    });
+
+    it('should instantiate with a relative path and a slURI baseURL object', function() {
+      var baseSLURI = new slURI('http://www.nateyolles.com/fr/fr/index.html');
+      var sluri = new slURI('/us/en/page.html', baseSLURI);
+      expect(sluri.href).toBe('http://www.nateyolles.com/us/en/page.html');
+    });
 
     it('should instantiate with a relative path and an HTMLAnchorElement baseURL object', function() {
       var baseURL = document.createElement('a');
