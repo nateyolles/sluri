@@ -1,20 +1,20 @@
 (function(window) {
   'use strict';
 
-  describe('slURI password tests', function() {
+  describe('SLURI password tests', function() {
 
     it('should return the password from instantiation', function() {
-      var sluri = new slURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.password).toBe('bar');
     });
 
     it('should return the empty password from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.password).toBe('');
     });
 
     it('should update the password', function() {
-      var sluri = new slURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.password).toBe('bar');
 
       sluri.password = 'biz';
@@ -22,7 +22,7 @@
     });
 
     it('should update the password as a string', function() {
-      var sluri = new slURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.password).toBe('bar');
 
       sluri.password = 123456;
@@ -30,7 +30,7 @@
     });
 
     it('should update the password with an empty string', function() {
-      var sluri = new slURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://foo:bar@www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.password).toBe('bar');
 
       sluri.password = '';

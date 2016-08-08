@@ -1,5 +1,5 @@
-var slURI = require("sluri");
-var sluri = new slURI('http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie');
+var SLURI = require("sluri");
+var sluri = new SLURI('http://user:pass@www.nateyolles.com/us/en/page.foo.bar.html/biz/baz?a=alpha&b=bravo#charlie');
 
 console.log(sluri.hostname);
 

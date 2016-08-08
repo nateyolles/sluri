@@ -15,13 +15,13 @@
  */
 
 /**
- * slURI is a client-side URI/URL manipulation library for Adobe Experience
- * Manager (AEM/CQ5) and Apache Sling. slURI is an implementation of the
+ * SLURI is a client-side URI/URL manipulation library for Adobe Experience
+ * Manager (AEM/CQ5) and Apache Sling. SLURI is an implementation of the
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/URL|URL API} with
  * considerations for the unique URL structure of AEM/Sling applications.
  *
  * Example:
- * var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
+ * var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.biz.baz.html/foo/bar?alpha=bravo&charlie=delta&echo#foxtrot');
  * sluri.protocol === 'http:'
  * sluri.username === 'user'
  * sluri.password === 'pass'
@@ -33,14 +33,14 @@
  * sluri.resourcePath === '/us/en/page'
  * sluri.extension === 'html'
  * sluri.selectorString === 'biz.baz'
- * sluri.selectors.constructor.name === 'slURISelectors'
+ * sluri.selectors.constructor.name === 'SLURISelectors'
  *     sluri.selectors.toString() === 'biz.baz'
  *     sluri.selectors.has('biz') === true
  *     sluri.selectors.append('qux')
  *     sluri.selectors.delete('biz')
  *     sluri.selectors.values() is ['baz', 'qux']
  * sluri.search === '?alpha=bravo&charlie=delta'
- * sluri.searchParams.constructor.name === 'slURISearchParams'
+ * sluri.searchParams.constructor.name === 'SLURISearchParams'
  *     sluri.searchParams.toString() === 'alpha=bravo&charlie=delta'
  *     sluri.searchParams.has('alpha') === true
  *     sluri.searchParams.get('alpha') === 'bravo'
@@ -67,21 +67,21 @@
  * window.location === 'http://www.currentsite.com';
  *
  * These are valid constructor calls:
- * var sluri = new slURI(fooString); // sluri.href === 'http://www.foo.com/us/en/foo.html'
- * var sluri = new slURI(fooURL); // sluri.href === 'http://www.foo.com/us/en/foo.html'
- * var sluri = new slURI(fooAnchor); // sluri.href === 'http://www.foo.com/us/en/foo.html'
- * var sluri = new slURI(window.location); // sluri.href === 'http://www.currentsite.com/'
- * var sluri = new slURI(barString, fooString); // sluri.href === 'http://www.foo.com/bar.html'
- * var sluri = new slURI(barString, fooURL); // sluri.href === 'http://www.foo.com/bar.html'
- * var sluri = new slURI(barString, fooAnchor); // sluri.href === 'http://www.foo.com/bar.html'
- * var sluri = new slURI(barString, window.location); // sluri.href ==='http://www.currentsite.com/bar.html'
+ * var sluri = new SLURI(fooString); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new SLURI(fooURL); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new SLURI(fooAnchor); // sluri.href === 'http://www.foo.com/us/en/foo.html'
+ * var sluri = new SLURI(window.location); // sluri.href === 'http://www.currentsite.com/'
+ * var sluri = new SLURI(barString, fooString); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new SLURI(barString, fooURL); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new SLURI(barString, fooAnchor); // sluri.href === 'http://www.foo.com/bar.html'
+ * var sluri = new SLURI(barString, window.location); // sluri.href ==='http://www.currentsite.com/bar.html'
  *
  * This script is in a UMD (Universal Module Definition) pattern allowing the
  * script to be used as a global, an AMD (Asynchronous Module Definition)
  * module with the use of an AMD loader such as RequireJS or Almond, or CommonJS
  * like environments such as Node.
  *
- * @module slURI
+ * @module SLURI
  * @author Nate Yolles <nate@nateyolles.com>
  * @copyright Nate Yolles 2016
  * @license Apache-2.0
@@ -102,7 +102,7 @@
         module.exports = factory();
     } else {
         // Browser globals
-        root.slURI = factory();
+        root.SLURI = factory();
     }
 }(this, function() {
     'use strict';
@@ -151,7 +151,7 @@
     }
 
     /**
-     * The slURI implementation of the URLSearchParams interface.
+     * The SLURI implementation of the URLSearchParams interface.
      *
      * Allows easy access to create, read, update and delete querystring
      * parameters without having to resort to manual string manipulation.
@@ -160,7 +160,7 @@
      * and values can be retrieved and set by the values as entered.
      *
      * Handles multiple values for a given key in the querystring. There are
-     * many ways different web frameworks handle this. slURISearchParams takes
+     * many ways different web frameworks handle this. SLURISearchParams takes
      * the same approach as the SearchParams interface that it is implementing.
      * An example of multiple values is: '?foo=red&bar=blue&foo=green'. Calling
      * the #get method will return the first occurrence, while calling the
@@ -175,7 +175,7 @@
      * @implements {URLSearchParams}
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams|URLSearchParams}
      */
-    function slURISearchParams(searchString) {
+    function SLURISearchParams(searchString) {
         var _searchString,
             _searchStringSplit,
 
@@ -409,7 +409,7 @@
      * without having to resort to manual string manipulation.
      *
      * Selectors are unique to Apache Sling and Adobe Experience Manager, as
-     * such there isn't an interface to implement. However, the slURISelectors
+     * such there isn't an interface to implement. However, the SLURISelectors
      * API matches the slURLSearchParams API and URLSearchParams interface as
      * closely as possible.
      *
@@ -418,7 +418,7 @@
      * @param {String} The selector string to be deconstructed and manipulated
      * @see {slURLSearchParams}
      */
-    function slURISelectors(selectorString) {
+    function SLURISelectors(selectorString) {
         /**
          * The internal array that backs the selector string.
          *
@@ -531,16 +531,16 @@
     * is provided and contains a valid URL origin.
     *
     * @class
-    * @alias module:slURI
-    * @param {String|URL|slURI|Location|HTMLAnchorElement} The URL used to
-    *     construct the slURI
-    * @param {String|URL|slURI|Location|HTMLAnchorElement} The base URL used to
-    *     construct the origin of the slURI if the urlString is a relative path
+    * @alias module:SLURI
+    * @param {String|URL|SLURI|Location|HTMLAnchorElement} The URL used to
+    *     construct the SLURI
+    * @param {String|URL|SLURI|Location|HTMLAnchorElement} The base URL used to
+    *     construct the origin of the SLURI if the urlString is a relative path
     * @throws {TypeError} if no arguments provided
     * @throws {TypeError} if URL cannot be constructed with a single parameter
     * @throws {TypeError} if URL cannot be constructed with the base parameter
     */
-    var slURI = function(urlString, baseURL) {
+    var SLURI = function(urlString, baseURL) {
         var _self = this,
             _parts,
             _protocol,
@@ -556,8 +556,8 @@
             _hash;
 
         /* Force instantiation of a new object */
-        if (!(this instanceof slURI)) {
-            throw new TypeError('Failed to construct \'slURI\': ' +
+        if (!(this instanceof SLURI)) {
+            throw new TypeError('Failed to construct \'SLURI\': ' +
                 'Please use the \'new\' operator, this DOM ' +
                 'object constructor cannot be called as a function.');
         }
@@ -570,7 +570,7 @@
 
         /**
          * Determines if a URL string is formatted in a way that it can become a
-         * slURI. Essentially that means the string starts with a protocol such
+         * SLURI. Essentially that means the string starts with a protocol such
          * as "http://".
          *
          * @private
@@ -585,7 +585,7 @@
 
         /**
          * Determines if an object is a URL type of object such as Location,
-         * HTMLAnchorElement, URL or slURI.
+         * HTMLAnchorElement, URL or SLURI.
          *
          * Test if objects exist so that this can run in any browser or Node
          * environment.
@@ -596,7 +596,7 @@
          * @returns {Boolean}
          */
         function isURLObject(url) {
-            return url instanceof slURI ||
+            return url instanceof SLURI ||
                     (typeof Location !== 'undefined' && url instanceof Location) ||
                     (typeof HTMLAnchorElement !== 'undefined' && url instanceof HTMLAnchorElement) ||
                     (typeof URL !== 'undefined' && url instanceof URL);
@@ -763,7 +763,7 @@
         /**
          * Create the URL parts based on the instantiated object.
          *
-         * urlString must be a String or a URL, slURI, window.location or
+         * urlString must be a String or a URL, SLURI, window.location or
          * HTMLAnchorElement. If it's a String, it must start with a protocol.
          *
          * @private
@@ -808,9 +808,9 @@
         }
 
         /**
-         * Define slURI getters and setters.
+         * Define SLURI getters and setters.
          *
-         * The slURI object behaves the same as the URL object by accessing and
+         * The SLURI object behaves the same as the URL object by accessing and
          * setting properties rather than using functions.
          */
         Object.defineProperties(this, {
@@ -1081,7 +1081,7 @@
                 },
                 set: function(value) {
                     if (value !== null && value !== undefined) {
-                        this.selectors = new slURISelectors(value);
+                        this.selectors = new SLURISelectors(value);
                     }
                 }
             },
@@ -1091,10 +1091,10 @@
              *
              * @public
              * @member
-             * @returns {slURISelectors}
+             * @returns {SLURISelectors}
              * @example
              * sluri.selectors; // returns {}
-             * sluri.selectors = new slURISelectors('biz.baz');
+             * sluri.selectors = new SLURISelectors('biz.baz');
              */
             'selectors': {
                 enumerable : true,
@@ -1103,7 +1103,7 @@
                     return _selectors;
                 },
                 set: function(value) {
-                    if (value instanceof slURISelectors) {
+                    if (value instanceof SLURISelectors) {
                         _selectors = value;
                     }
                 }
@@ -1178,7 +1178,7 @@
                 },
                 set: function(value) {
                     if (value !== null && value !== undefined) {
-                        _searchParams = new slURISearchParams(value);
+                        _searchParams = new SLURISearchParams(value);
                     }
                 }
             },
@@ -1188,10 +1188,10 @@
              *
              * @public
              * @member
-             * @returns {slURISearchParams}
+             * @returns {SLURISearchParams}
              * @example
              * sluri.searchParams; // returns {}
-             * sluri.searchParams = new slURISearchParams('foo=bar&biz=baz'');
+             * sluri.searchParams = new SLURISearchParams('foo=bar&biz=baz'');
              */
             'searchParams': {
                 enumerable : true,
@@ -1200,7 +1200,7 @@
                     return _searchParams;
                 },
                 set: function(value) {
-                    if (value instanceof slURISearchParams) {
+                    if (value instanceof SLURISearchParams) {
                         _searchParams = value;
                     }
                 }
@@ -1278,28 +1278,28 @@
     };
 
     /**
-     * Return the href as the String representation of the slURI object.
+     * Return the href as the String representation of the SLURI object.
      *
      * @function
      * @public
      * @override
      */
-    slURI.prototype.toString = function(){
+    SLURI.prototype.toString = function(){
         return this.href;
     };
 
     /**
-     * Return the href as the String representation of the slURI object.
+     * Return the href as the String representation of the SLURI object.
      *
      * @function
      * @public
      * @override
      * @see {@link toString}
      */
-    slURI.prototype.toLocaleString = function(){
+    SLURI.prototype.toLocaleString = function(){
         return this.href;
     };
 
-    /* Make the slURI object public and instantiable. */
-    return slURI;
+    /* Make the SLURI object public and instantiable. */
+    return SLURI;
 }));

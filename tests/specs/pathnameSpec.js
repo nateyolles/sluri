@@ -1,30 +1,30 @@
 (function(window) {
   'use strict';
 
-  describe('slURI pathname tests', function() {
+  describe('SLURI pathname tests', function() {
 
     it('should return the pathname from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.html');
     });
 
     it('should return the pathname from instantiation with selectors', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
     });
 
     it('should return the pathname "/" for root', function() {
-      var sluri = new slURI('http://www.nateyolles.com');
+      var sluri = new SLURI('http://www.nateyolles.com');
       expect(sluri.pathname).toBe('/');
     });
 
     it('should return the pathname "/" for root instantiated with a slash', function() {
-      var sluri = new slURI('http://www.nateyolles.com/');
+      var sluri = new SLURI('http://www.nateyolles.com/');
       expect(sluri.pathname).toBe('/');
     });
 
     it('should update the pathname with selectors', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = '/fr/fr/page.biz.baz.html'
@@ -34,7 +34,7 @@
     });
 
     it('should update the pathname when selectors are updated', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.selectors.append('qux');
@@ -44,7 +44,7 @@
     });
 
     it('should update the pathname with a slash', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = '/'
@@ -54,7 +54,7 @@
     });
 
     it('should update the pathname with a single word', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = '/biz';
@@ -65,7 +65,7 @@
     });
 
     it('should update the pathname with a single word no slash', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = 'biz';
@@ -76,7 +76,7 @@
     });
 
     it('should update the pathname without starting with a slash', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = 'fr/fr/page.html';
@@ -86,7 +86,7 @@
     });
 
     it('should update the pathname with a number', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = 123;
@@ -96,7 +96,7 @@
     });
 
     it('should update the pathname with an empty string', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = '';
@@ -106,7 +106,7 @@
     });
 
     it('should not update the pathname with null or undefined', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html?alpha=bravo&charlie=delta');
       expect(sluri.pathname).toBe('/us/en/page.foo.bar.html');
 
       sluri.pathname = '/'

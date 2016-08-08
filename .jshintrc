@@ -9,7 +9,7 @@
     "eqeqeq": true,
     "immed": true,
     "latedef": true,
-    "newcap": false,
+    "newcap": true,
     "noarg": true,
     "quotmark": "single",
     "regexp": true,

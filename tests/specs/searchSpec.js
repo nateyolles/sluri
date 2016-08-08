@@ -1,20 +1,20 @@
 (function(window) {
   'use strict';
 
-  describe('slURI search tests', function() {
+  describe('SLURI search tests', function() {
 
     it('should return the search from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html?alpha=bravo&charlie=delta');
       expect(sluri.search).toBe('?alpha=bravo&charlie=delta');
     });
 
     it("it should return empty string if there isn't a search string", function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.search).toBe('');
     });
 
     it("it should format a parameter with an equals sign even without a value", function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo&charlie');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo&charlie');
       expect(sluri.search).toBe('?alpha=bravo&charlie=');
 
       sluri.search = '?delta&echo=foxtrot';
@@ -22,7 +22,7 @@
     });
 
     it('should update the search with a single string', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
       expect(sluri.search).toBe('?alpha=bravo');
 
       sluri.search = 'charlie';
@@ -30,7 +30,7 @@
     });
 
     it('should update the search with a number', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
       expect(sluri.search).toBe('?alpha=bravo');
 
       sluri.search = 123;
@@ -41,12 +41,12 @@
     });
 
     it('should not remove the search when provided empty string', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
       expect(sluri.search).toBe('?alpha=bravo');
     });
 
     it('should update the search', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
       expect(sluri.search).toBe('?alpha=bravo');
 
       sluri.search = '?charlie=delta'
@@ -57,7 +57,7 @@
     });
 
     it('should not update when provided null or undefined', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html?alpha=bravo');
       expect(sluri.search).toBe('?alpha=bravo');
 
       sluri.search = null;

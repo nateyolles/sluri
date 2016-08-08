@@ -1,25 +1,25 @@
 (function(window) {
   'use strict';
 
-  describe('slURI extension tests', function() {
+  describe('SLURI extension tests', function() {
 
     it('should return the extension from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com:4502/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com:4502/us/en/page.html');
       expect(sluri.extension).toBe('html');
     });
 
     it('should return empty string if the path absent from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com/');
+      var sluri = new SLURI('http://www.nateyolles.com/');
       expect(sluri.extension).toBe('');
     });
 
     it('should return empty string if the path absent from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com');
+      var sluri = new SLURI('http://www.nateyolles.com');
       expect(sluri.extension).toBe('');
     });
 
     it('should update the extension', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html');
       expect(sluri.extension).toBe('html');
 
       sluri.extension = 'json';
@@ -28,7 +28,7 @@
     });
 
     it("should not update the extension if there wasn't one to begin with", function() {
-      var sluri = new slURI('http://www.nateyolles.com/');
+      var sluri = new SLURI('http://www.nateyolles.com/');
       expect(sluri.extension).toBe('');
 
       sluri.extension = 'json';
@@ -36,7 +36,7 @@
     });
 
     it('should not update the extension if null, undefined, or empty string', function(){
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html');
       expect(sluri.extension).toBe('html');
 
       sluri.extension = null;

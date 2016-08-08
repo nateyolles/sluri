@@ -1,20 +1,20 @@
 (function(window) {
   'use strict';
 
-  describe('slURI selector string tests', function() {
+  describe('SLURI selector string tests', function() {
 
     it('should return the selector string from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
       expect(sluri.selectorString).toBe('foo.bar');
     });
 
     it('should return empty string if the selector string was absent from instantiation', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html');
       expect(sluri.selectorString).toBe('');
     });
 
     it('should update the selector string', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.html');
       expect(sluri.selectorString).toBe('');
 
       sluri.selectorString = 'foo.bar';
@@ -22,7 +22,7 @@
     });
 
     it('should remove the selector string', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
       expect(sluri.selectorString).toBe('foo.bar');
 
       sluri.selectorString = '';
@@ -30,7 +30,7 @@
     });
 
     it('should not update the selector string with null or undefined', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
       expect(sluri.selectorString).toBe('foo.bar');
 
       sluri.selectorString = null;
@@ -41,7 +41,7 @@
     });
 
     it('should update selectors as well', function() {
-      var sluri = new slURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
+      var sluri = new SLURI('http://www.nateyolles.com/us/en/page.foo.bar.html');
       expect(sluri.selectorString).toBe('foo.bar');
       expect(sluri.selectors.values()).toEqual(['foo', 'bar']);
 

@@ -1,15 +1,15 @@
 (function(window) {
   'use strict';
 
-  describe('slURI href tests', function() {
+  describe('SLURI href tests', function() {
 
     it('should return the href from instantiation', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
     });
 
     it('should update the protocol', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.port = 1234;
@@ -17,7 +17,7 @@
     });
 
     it('should update the username', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.username = 'foo';
@@ -25,7 +25,7 @@
     });
 
     it('should update the password', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.password = 'foo';
@@ -33,7 +33,7 @@
     });
 
     it('should update the hostname', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.hostname = 'www.example.com';
@@ -41,7 +41,7 @@
     });
 
     it('should update the host', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.host = 'www.example.com:1111';
@@ -49,7 +49,7 @@
     });
 
     it('should update the port', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.port = 1111;
@@ -57,7 +57,7 @@
     });
 
     it('should update the pathname', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.pathname = '/fr/fr/page.foo.bar.html';
@@ -65,7 +65,7 @@
     });
 
     it('should update the extension', function() {
-      var sluri = new slURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
+      var sluri = new SLURI('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
       expect(sluri.href).toBe('http://user:pass@www.nateyolles.com:4502/us/en/page.foo.bar.html/biz/baz?alpha=bravo&charlie=delta');
 
       sluri.extension = 'json';

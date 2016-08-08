@@ -1,6 +1,6 @@
 {
   "name": "sluri",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AEM and Apache Sling client-side URI manipulation including support for selectors, suffixes, resourcePath and extentions.",
   "main": "sluri.js",
   "keywords": [
